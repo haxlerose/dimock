@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dimock Camp Meeting Ground</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white py-4">
+      <div class="container-fluid">
+        <a class="navbar-brand ps-2 text-success fw-bold me-2" href="index.html">Dimock Camp Meeting Ground</a>
+        <button class="navbar-toggler px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-lg-center ps-2" id="navbarNavAltMarkup">
+          <div class="navbar-nav fw-bold">
+            <a class="nav-link px-4" href="about.html">About</a>
+            <a class="nav-link px-4" href="services.html">Services</a>
+            <a class="nav-link px-4" href="events.html">Events</a>
+            <a class="nav-link px-4 active" href="visit.html">Visit Us</a>
+            <a class="nav-link px-4" href="contact.html">Contact</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1 class="my-5">Visit Us</h1>
+
+      <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-black active" id="lodging-tab" data-bs-toggle="tab" data-bs-target="#lodging-tab-pane" type="button" role="tab" aria-controls="lodging-tab-pane" aria-selected="true">Lodging</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-black" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Nearby Attractions</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-black" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="false">Directions</button>
+        </li>
+      </ul>
+
+      <div class="card shadow border-0 my-5">
+        <div class="card-body">
+          <div class="tab-content" id="tab-content">
+            <!-- Lodging Content -->
+            <div class="tab-pane fade show active" id="lodging-tab-pane" role="tabpanel" aria-labelledby="lodging-tab" tabindex="0">
+              <h3 class="text-success fw-bold mb-4">Lodging</h3>
+              <p>
+                Lewis Lodge, a cottage named in tribute to Rev. Joshua Lewis, an integral part of the early history of
+                the Dimock grounds. The lodge has three bedrooms, a bathroom with a shower, and a kitchen. A donation of
+                $25 per night or $125 per week is suggested, which directly contributes to the upkeep of the
+                Association's facilities.
+              </p>
+              <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#lewis">Lewis Lodge</button>
+            </div>
+
+            <!-- Nearby Attractions Content -->
+            <div class="tab-pane fade" id="nearby-tab-pane" role="tabpanel" aria-labelledby="nearby-tab" tabindex="1">
+              <h3 class="text-success fw-bold mb-4">Nearby Attractions</h3>
+              <button type="button" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#bears">Bears Near the Pond</button>
+
+              <p>
+                There is a boundary nature trail on the campground nearly a mile in length. Also, a companion
+                <em>Boundary Nature Trail Guidebook</em> which discusses the various plants and animals to be found, as
+                well as references to historic sites and events. Pick it up in the box at the pavilion.
+              </p>
+
+              <ul class="list-unstyled mb-3">
+                <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/woodbourne-preserve-1.xml" target="_blank">Woodbourne Forest and Wildlife Sanctuary</a> (Dimock)</li>
+                <li><a href="http://en.wikipedia.org/wiki/Montrose_Historic_District_%28Montrose,_Pennsylvania%29" target="_blank">Historic Montrose</a></li>
+                <li><a href="http://www.oldmillvillage.org" target="_blank">Old Mill Village</a></li>
+                <!-- <li><a href="http://www.snakecreekalpacafarm.com/" target="_blank">Alpaca farm in Montrose</a></li> -->
+                <li><a href="http://en.wikipedia.org/wiki/Tunkhannock_Viaduct" target="_blank">Tunkhannock Viaduct</a> and <a href="https://historicbridges.org/bridges/browser/?bridgebrowser=pennsylvania/martinscreek/">Martins Creek Viaduct</a></li>
+                <li><a href="http://www.montroseblueberryfestival.net" target="_blank">The Blueberry Festival</a></li>
+                <li><a href="http://www.farmfair.org" target="_blank">Harford County Fair</a></li>
+                <li><a href="http://www.wyomingcountyfair.com" target="_blank">Wyoming County Fair</a></li>
+                <li><a href="https://www.howlandpreserve.com/" target="_blank">Howland Preserve</a> (Tunkhannock)</li>
+                <li><a href="https://www.dcnr.pa.gov/StateParks/FindAPark/SaltSpringsStatePark/Pages/default.aspx" target="_blank">Salt Springs State Park</a> (Montrose)</li>
+                <li><a href="http://www.kayaktheriver.com" target="_blank">Susquehanna Kayak and Canoe Rental</a></li>
+                <li>You can even fly over the Endless Mountains in a hot air balloon: <a href="http://www.weflyhotair.com/" target="_blank">Endless Mountains Hot Air Balloons</a> (Nicholson)</li>
+                <li><a href="http://www.endlessmountains.org/" target="_blank">Endless Mountains Visitors Bureau</a></li>
+                <li>And, of course, there is area antiquing</li>
+              </ul>
+
+              <h2>And Further Afield</h2>
+              <ul class="list-unstyled">
+                <li><a href="http://www.nps.gov/stea/index.htm" target="_blank">Steamtown National Historic Site</a> (Scranton)</li>
+                <li><a href="https://www.visitnepa.org/listing/lackawanna-coal-mine-tour/196/" target="_blank">Lackawanna Coal Mine</a> (Scranton)</li>
+                <li><a href="http://www.everhart-museum.org" target="_blank">Everhart Museum</a> (Scranton)</li>
+                <li><a href="http://www.anthracitemuseum.org" target="_blank">Anthracite Heritage Museum & Iron Furnaces</a> (Scranton)</li>
+                <li><a href="https://www.rossparkzoo.org" target="_blank">Binghamton Zoo at Ross Park</a> (Binghamton)</li>
+                <li><a href="http://www.roberson.org" target="_blank">Roberson Museum and Science Center</a> (Binghamton)</li>
+                <li><a href="https://www.dcnr.pa.gov/StateParks/FindAPark/WorldsEndStatePark/Pages/default.aspx" target="_blank">World's End State Park</a> (Forksville, PA)</li>
+                <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/florence-shelly-preserve.xml" target="_blank">Florence Shelly Preserve</a> (Thompson Borough, PA)</li>
+              </ul>
+            </div>
+
+            <!-- Directions Content -->
+            <div class="tab-pane fade" id="directions-tab-pane" role="tabpanel" aria-labelledby="directions-tab" tabindex="2">
+              <h3 class="text-success fw-bold mb-4">Directions</h3>
+              <p>
+                When originally constructed, the Dimock grounds were just a short walk from the Dimock train station on
+                the narrow-guage railroad that went from Tunkhannock to Montrose.
+              </p>
+              <p>
+                Today, one can find the Dimock grounds, by following Pa. Rt. 29 about 15 miles north of Tunkhannock and
+                about 7 miles south of Montrose.  At the blinker light in Dimock (intersection of Rt. 29 and State Route
+                3023) go west about one-half mile and then make a left-hand turn onto Campground Road, and after about
+                50 yards make another left onto the entrance road to the grounds. (We know that we're in Dimock, but
+                Google seems to think we're in Springville.)
+              </p>
+              <div class="ratio ratio-16x9 mt-5">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10012.510099066822!2d-75.911887573667!3d41.747763991583376!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89dacdf07495007b%3A0x12794bbe52cdf98!2sDimock+Camp+Meeting+Ground!5e0!3m2!1sen!2sus!4v1555552593979!5m2!1sen!2sus" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+              </div>
+            </div>
+            <!-- End tab content -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lewis Lodge Modal -->
+    <div class="modal fade px-1" id="lewis" tabindex="-1" aria-labelledby="lewisLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="lewisLabel">Lewis Lodge</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="lewislodge.jpg" class="img-fluid rounded shadow">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bears Modal -->
+    <div class="modal fade px-1" id="bears" tabindex="-1" aria-labelledby="bearsLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="bearsLabel">A mother bear and her three cubs having dinner at some bird feeders near the pond</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <div id="carouselIndicators" class="carousel slide">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="5" aria-label="Slide 6"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="6" aria-label="Slide 7"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="7" aria-label="Slide 8"></button>
+                <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="8" aria-label="Slide 9"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="bears1.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears2.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears3.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears4.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears5.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears6.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears7.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears8.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="bears9.jpg" class="d-block w-100" alt="...">
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modals -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  </body>
+</html>

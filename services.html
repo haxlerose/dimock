@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dimock Camp Meeting Ground</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white py-4">
+      <div class="container-fluid">
+        <a class="navbar-brand ps-2 text-success fw-bold me-2" href="index.html">Dimock Camp Meeting Ground</a>
+        <button class="navbar-toggler px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-lg-center ps-2" id="navbarNavAltMarkup">
+          <div class="navbar-nav fw-bold">
+            <a class="nav-link px-4" href="about.html">About</a>
+            <a class="nav-link px-4 active" href="services.html">Services</a>
+            <a class="nav-link px-4" href="events.html">Events</a>
+            <a class="nav-link px-4" href="visit.html">Visit Us</a>
+            <a class="nav-link px-4" href="contact.html">Contact</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1 class="my-5">Services</h1>
+
+      <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-black active" id="meeting-tab" data-bs-toggle="tab" data-bs-target="#meeting-tab-pane" type="button" role="tab" aria-controls="meeting-tab-pane" aria-selected="true">Camp Meeting</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-black" id="rekindling-tab" data-bs-toggle="tab" data-bs-target="#rekindling-tab-pane" type="button" role="tab" aria-controls="rekindling-tab-pane" aria-selected="false">Rekindling</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link text-black" id="prayer-tab" data-bs-toggle="tab" data-bs-target="#prayer-tab-pane" type="button" role="tab" aria-controls="prayer-tab-pane" aria-selected="false">A Prayer</button>
+        </li>
+      </ul>
+
+      <div class="card shadow border-0 my-5">
+        <div class="card-body">
+          <div class="tab-content" id="tab-content">
+            <!-- Camp Meeting Content -->
+            <div class="tab-pane fade show active" id="meeting-tab-pane" role="tabpanel" aria-labelledby="meeting-tab" tabindex="0">
+              <h3 class="text-success fw-bold mb-4">What is a Camp Meeting?</h3>
+              <p>
+                In the late 1700s, a tradition was begun in America in which individuals eager
+                to spread their Christian faith gathered in revival-styled services for days
+                on end, first camping out under the stars, later in tents, and eventually in
+                wooden cottages all surrounding an open-air sanctuary.  Originally, the
+                Baptists, Presbyterians and Methodists were a part of the mix, but it was the
+                Methodist Episcopal Church that saw camp meetings as an integral part of
+                helping people renew their faith commitments while sharing
+                fellowship with like-minded individuals in their region.
+              </p>
+              <p>
+                By 1810, Methodist Bishop Francis Asbury noted in his journal that it was his
+                hope that at least 600 camp meetings could be held annually throughout the
+                young United States.  In 1807, the first known camp meeting in this area
+                occurred about 30 miles northwest of Dimock, near present-day Smithboro, New
+                York.  It went on for four days and Asbury was in attendance during the
+                last two.
+              </p>
+              <p>
+                By the 1870s, plans were underway to install permanent camp meeting grounds in
+                each of the regional districts within the Methodist Episcopal Church's annual
+                conferences.  The Dimock grounds were to serve the Wyalusing District, then
+                one of seven districts in the Methodist Episcopal Church's Wyoming
+                Conference.  The Wyalusing District was dissolved in 1879, but camp meetings
+                continued.
+              </p>
+              <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#poster">1936 Camp Meeting Poster</button>
+            </div>
+
+            <!-- Rekindling Content -->
+            <div class="tab-pane fade text-center" id="rekindling-tab-pane" role="tabpanel" aria-labelledby="rekindling-tab" tabindex="1">
+              <h3 class="text-success fw-bold mb-4">A Great Place to Rekindle Your Spirit</h3>
+              <p>Attend the Sunday evening chapel programs.</p>
+              <p>Hear inspirational preaching, musical groups, or witness religious rama.</p>
+              <p>Engage in an ecumenical spirit of friendship and fellowship around a table.</p>
+              <p>Participate in a stimulating study group to stretch and grow your faith.</p>
+              <p>
+                Enjoy a
+                <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#sunset">sunset</button>
+                and solitude at the end of a day at Sunset Point overlooking the valley below.
+              </p>
+              <p>
+                Sing around the
+                <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#campfire">campfire</button>
+                in the camp square.
+              </p>
+              <p>Hike the nature trails.</p>
+              <p>Picnic at the Pavilion, have potlucks or game nights in the dining hall.</p>
+              <p>Chat with others on patios and porches or over a shared meal.</p>
+              <p>Work alongside others to maintain our traditions.</p>
+            </div>
+
+            <!-- A Prayer Content -->
+            <div class="tab-pane fade text-center" id="prayer-tab-pane" role="tabpanel" aria-labelledby="prayer-tab" tabindex="2">
+              <h3 class="text-success fw-bold mb-4">A Prayer</h3>
+              <p>
+                O God, we lift up before you now the life and mission of the Dimock Campmeeting. As sojourners upon this
+                sacred ground, we are grateful for the vision efforts and memory of those who have gone before. Enable
+                us to faithfully steward these grounds and the purpose and mission for which they were created. Inspire
+                within us a sense of community, unity amidst our diversity, and the desire to seek the common good so
+                that the gospel of Jesus Christ may forever be heard and known through our having been together at this
+                time and in this place. In Christ's name we pray.
+              </p>
+              <div class="fw-bold">
+                Amen
+              </div>
+            </div>
+            <!-- End tab content -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poster Modal -->
+    <div class="modal fade px-1" id="poster" tabindex="-1" aria-labelledby="posterLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="posterLabel">1936 Camp Meeting Poster</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="poster.jpg" class="img-fluid rounded shadow">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sunset Modal -->
+    <div class="modal fade px-1" id="sunset" tabindex="-1" aria-labelledby="sunsetLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="sunsetLabel">Sunset</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="sunset.jpg" class="img-fluid rounded shadow">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campfire Modal -->
+    <div class="modal fade px-1" id="campfire" tabindex="-1" aria-labelledby="campfireLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="campfireLabel">Campfire</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img src="campfire.jpg" class="img-fluid rounded shadow">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modals -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  </body>
+</html>
