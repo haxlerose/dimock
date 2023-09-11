@@ -32,12 +32,13 @@
         <li class="nav-item border-end pe-3" role="presentation">
           <button class="nav-link text-black active" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="false">Directions</button>
         </li>
-        <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link text-black" id="lodging-tab" data-bs-toggle="tab" data-bs-target="#lodging-tab-pane" type="button" role="tab" aria-controls="lodging-tab-pane" aria-selected="true">Lodging</button>
-        </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link text-black" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Attractions</button>
         </li>
+        <!-- Removing lodging for now since Lewis Lodge is for sale -->
+        <!-- <li class="nav-item border-end pe-3" role="presentation">-->
+        <!-- <button class="nav-link text-black" id="lodging-tab" data-bs-toggle="tab" data-bs-target="#lodging-tab-pane" type="button" role="tab" aria-controls="lodging-tab-pane" aria-selected="true">Lodging</button>-->
+        <!-- </li>-->
       </ul>
 
       <div class="card shadow border-0 my-5">
@@ -61,20 +62,8 @@
               </div>
             </div>
 
-            <!-- Lodging Content -->
-            <div class="tab-pane fade" id="lodging-tab-pane" role="tabpanel" aria-labelledby="lodging-tab" tabindex="1">
-              <h3 class="text-success fw-bold mb-4 text-center">Lodging</h3>
-              <p>
-                Lewis Lodge, a cottage named in tribute to Rev. Joshua Lewis, an integral part of the early history of
-                the Dimock grounds. The lodge has three bedrooms, a bathroom with a shower, and a kitchen. A donation of
-                $25 per night or $125 per week is suggested, which directly contributes to the upkeep of the
-                Association's facilities.
-              </p>
-              <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#lewis">Lewis Lodge</button>
-            </div>
-
             <!-- Nearby Attractions Content -->
-            <div class="tab-pane fade" id="nearby-tab-pane" role="tabpanel" aria-labelledby="nearby-tab" tabindex="2">
+            <div class="tab-pane fade" id="nearby-tab-pane" role="tabpanel" aria-labelledby="nearby-tab" tabindex="1">
               <h3 class="text-success fw-bold mb-4 text-center">Attractions</h3>
               <button type="button" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#bears">Bears Near the Pond</button>
 
@@ -113,6 +102,18 @@
                 <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/florence-shelly-preserve.xml" target="_blank">Florence Shelly Preserve</a> (Thompson Borough, PA)</li>
               </ul>
             </div>
+
+            <!-- Lodging Content (removed since Lewis Lodge is for sale) -->
+            <!-- <div class="tab-pane fade" id="lodging-tab-pane" role="tabpanel" aria-labelledby="lodging-tab" tabindex="2">-->
+            <!--   <h3 class="text-success fw-bold mb-4 text-center">Lodging</h3>-->
+            <!--   <p>-->
+            <!--     Lewis Lodge, a cottage named in tribute to Rev. Joshua Lewis, an integral part of the early history of-->
+            <!--     the Dimock grounds. The lodge has three bedrooms, a bathroom with a shower, and a kitchen. A donation of-->
+            <!--     $25 per night or $125 per week is suggested, which directly contributes to the upkeep of the-->
+            <!--     Association's facilities.-->
+            <!--   </p>-->
+            <!--   <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#lewis">Lewis Lodge</button>-->
+            <!-- </div>-->
             <!-- End tab content -->
           </div>
         </div>
