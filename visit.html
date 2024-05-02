@@ -41,13 +41,12 @@
         <li class="nav-item border-end pe-3" role="presentation">
           <button class="nav-link text-black active" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="false">Directions</button>
         </li>
-        <li class="nav-item" role="presentation">
+        <li class="nav-item border-end pe-3" role="presentation">
           <button class="nav-link text-black" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Attractions</button>
         </li>
-        <!-- Removing lodging for now since Lewis Lodge is for sale -->
-        <!-- <li class="nav-item border-end pe-3" role="presentation">-->
-        <!-- <button class="nav-link text-black" id="lodging-tab" data-bs-toggle="tab" data-bs-target="#lodging-tab-pane" type="button" role="tab" aria-controls="lodging-tab-pane" aria-selected="true">Lodging</button>-->
-        <!-- </li>-->
+        <li class="nav-item border-end pe-3" role="presentation">
+          <button class="nav-link text-black" id="cottages-tab" data-bs-toggle="tab" data-bs-target="#cottages-tab-pane" type="button" role="tab" aria-controls="cottages-tab-pane" aria-selected="true">Cottages</button>
+        </li>
       </ul>
 
       <div class="card shadow border-0 my-5">
@@ -112,33 +111,19 @@
               </ul>
             </div>
 
-            <!-- Lodging Content (removed since Lewis Lodge is for sale) -->
-            <!-- <div class="tab-pane fade" id="lodging-tab-pane" role="tabpanel" aria-labelledby="lodging-tab" tabindex="2">-->
-            <!--   <h3 class="text-success fw-bold mb-4 text-center">Lodging</h3>-->
-            <!--   <p>-->
-            <!--     Lewis Lodge, a cottage named in tribute to Rev. Joshua Lewis, an integral part of the early history of-->
-            <!--     the Dimock grounds. The lodge has three bedrooms, a bathroom with a shower, and a kitchen. A donation of-->
-            <!--     $25 per night or $125 per week is suggested, which directly contributes to the upkeep of the-->
-            <!--     Association's facilities.-->
-            <!--   </p>-->
-            <!--   <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#lewis">Lewis Lodge</button>-->
-            <!-- </div>-->
-            <!-- End tab content -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lewis Lodge Modal -->
-    <div class="modal fade px-1" id="lewis" tabindex="-1" aria-labelledby="lewisLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="lewisLabel">Lewis Lodge</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body text-center">
-            <img src="lewislodge.jpg" class="img-fluid rounded shadow">
+            <!-- Cottages For Sale content -->
+            <div class="tab-pane fade" id="cottages-tab-pane" role="tabpanel" aria-labelledby="lodging-tab" tabindex="2">
+              <h3 class="text-success fw-bold mb-4 text-center">Cottages For Sale</h3>
+              <h5>Kevin Setzer's Cottage</h5>
+              <p>
+                This cottage is currently for sale for $12,000. It features a new roof, new windows, and updated electrical installations. The plumbing is partially installed, and the foundation was redone 7 years ago. The cottage includes an addition built 15 years ago and offers potential for three bedrooms.
+                Prospective buyers must be approved by the Board of Directors and demonstrate financial capability to complete renovations. Ownership comes with a commitment to an annual land lease and taxes totaling approximately $850, participation in at least two Sunday evening services each season, and involvement in community maintenance efforts.
+              </p>
+              <p>
+                For inquiries, please contact <b>Kevin Setzer</b> at <b>570-396-6331</b>
+              </p>
+              <button type="button" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#kevinCottage">Kevin Setzer Cottage Photos</button>
+            </div>
           </div>
         </div>
       </div>
@@ -199,6 +184,58 @@
                 <span class="visually-hidden">Previous</span>
               </button>
               <button class="carousel-control-next" type="button" data-bs-target="#carouselIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kevin Setzer Cottage Modal -->
+    <div class="modal fade px-1" id="kevinCottage" tabindex="-1" aria-labelledby="kevinCottageLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="kevinCottageLabel">Photos of Kevin Setzer's Cottage</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <div id="cottageCarouselIndicators" class="carousel slide">
+              <div class="carousel-indicators">
+                <button type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                <button type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide-to="5" aria-label="Slide 6"></button>
+              </div>
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="kevin_cottage_1.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="kevin_cottage_2.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="kevin_cottage_3.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="kevin_cottage_4.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="kevin_cottage_5.jpg" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                  <img src="kevin_cottage_6.jpg" class="d-block w-100" alt="...">
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#cottageCarouselIndicators" data-bs-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Next</span>
               </button>
