@@ -106,6 +106,13 @@ foreach ($logFiles as $logFile) {
             tr:hover {
                 background-color: #e9e9e9;
             }
+            .method { color: #FF5722; }
+            .url { color: #1976D2; }
+            .protocol { color: #388E3C; }
+            .status { color: #E64A19; }
+            .size { color: #7B1FA2; }
+            .referer { color: #FF9800; }
+            .user-agent { color: #9C27B0; }
         </style>
     </head>
     <body>
@@ -136,11 +143,25 @@ foreach ($logFiles as $logFile) {
                                 $parts = explode(' ', $line);
                                 $ip = $parts[0];
                                 $datetime = substr($parts[3], 1) . ' ' . $parts[4];
-                                $details = implode(' ', array_slice($parts, 5));
+                                $method = $parts[5];
+                                $url = $parts[6];
+                                $protocol = $parts[7];
+                                $status = $parts[8];
+                                $size = $parts[9];
+                                $referer = $parts[10];
+                                $userAgent = implode(' ', array_slice($parts, 11));
                                 echo "<tr>";
                                 echo "<td>" . htmlspecialchars($datetime) . "</td>";
                                 echo "<td>" . htmlspecialchars($ip) . "</td>";
-                                echo "<td><div>" . htmlspecialchars($details) . "</div></td>";
+                                echo "<td>";
+                                echo "<span class='method'>" . htmlspecialchars($method) . "</span> ";
+                                echo "<span class='url'>" . htmlspecialchars($url) . "</span> ";
+                                echo "<span class='protocol'>" . htmlspecialchars($protocol) . "</span> ";
+                                echo "<span class='status'>" . htmlspecialchars($status) . "</span> ";
+                                echo "<span class='size'>" . htmlspecialchars($size) . "</span> ";
+                                echo "<span class='referer'>" . htmlspecialchars($referer) . "</span> ";
+                                echo "<span class='user-agent'>" . htmlspecialchars($userAgent) . "</span>";
+                                echo "</td>";
                                 echo "</tr>";
                             }
                         }
