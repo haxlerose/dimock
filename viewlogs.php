@@ -10,7 +10,6 @@
         <?php
             session_start();
 
-            // Set your hashed password (output from Ruby bcrypt)
             $hashed_password = '$2a$12$y3XrdujO9rE544vJsXcTZ.lKat6r2VfTBZVh7BIo2P.Xu7FRVuZPi';
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
@@ -34,22 +33,26 @@
                 exit;
             }
 
-            // Display logs if password is correct
-            $logDir = __DIR__;  // Adjust the path as necessary
-            $logFiles = array_reverse(glob("$logDir/*.gz")); // Adjust the path as necessary
 
-            foreach ($logFiles as $logFile) {
-                echo "<h2>" . basename($logFile) . "</h2>";
-                $fp = gzopen($logFile, 'r');
-                if ($fp) {
-                    echo '<pre>';
-                    while (!gzeof($fp)) {
-                        echo gzgets($fp);
+            $logDir = '/homepages/46/d339340751/htdocs/logs';
+            $logFiles = array_reverse(glob("$logDir/*.gz"));
+
+            if (empty($logFiles)) {
+                echo "<p>No log files found in directory.</p>";
+            } else {
+                foreach ($logFiles as $logFile) {
+                    echo "<h2>" . basename($logFile) . "</h2>";
+                    $fp = gzopen($logFile, 'r');
+                    if ($fp) {
+                        echo '<pre>';
+                        while (!gzeof($fp)) {
+                            echo gzgets($fp);
+                        }
+                        echo '</pre>';
+                        gzclose($fp);
+                    } else {
+                        echo "<p>Error opening file: $logFile</p>";
                     }
-                    echo '</pre>';
-                    gzclose($fp);
-                } else {
-                    echo "<p>Error opening file.</p>";
                 }
             }
         ?>
