@@ -8,18 +8,10 @@
           rel="stylesheet"
           integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
           crossorigin="anonymous">
-    <style>
-      /* Setting the navbar toggler icon stroke to Bootstrap success color using rgb values (25, 135, 84) */
-
-      .navbar-toggler-icon {
-        background-image: url(
-          "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(25, 135, 84, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"
-        );
-      }
-    </style>
+    <link href="site.css" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-white py-4">
+    <nav class="navbar navbar-expand-lg bg-white py-3">
       <div class="container-fluid">
         <a class="navbar-brand ps-0 ps-md-4 text-success fw-bold me-2" href="/">
           Dimock Camp Meeting Ground
@@ -47,13 +39,13 @@
     </nav>
 
     <div class="container">
-      <h1 class="my-5">Events</h1>
+      <h1 class="page-title">Events</h1>
 
       <h3 class="text-success fw-bold mb-4 text-center">
         2026 Schedule, 149th Season
       </h3>
 
-      <div class="alert alert-info mb-5" role="info">
+      <div class="notice p-4 mb-5" role="note">
         <p class="fw-bold">
           All Services begin at 6pm usually on Sundays. Saturday service
           dates are marked in <span class="text-danger">red</span>. Fellowship
@@ -70,11 +62,11 @@
       </div>
 
       <!-- Start of events -->
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-danger bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-danger fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-saturday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sat</div>
             <div class="ms-0 ms-md-1 no-break">Jul 11</div>
           </div>
@@ -83,17 +75,17 @@
             All That Glitters
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           A Christian band from Berwick, PA.
           <a href="https://facebook.com/AllThatGlittersBand">All That Glitters Facebook</a>
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-danger bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-danger fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-saturday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sat</div>
             <div class="ms-0 ms-md-1 no-break">Jul 18</div>
           </div>
@@ -102,18 +94,18 @@
             The Sisterhood Music
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           An all-female Christian band from Dalton. "We are a group of sisters,
           some related by birth and some by friendship, who love music."
           <a href="https://facebook.com/the.sisterhood.music.2025">The Sisterhood Music Facebook</a>
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-danger bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-danger fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-saturday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sat</div>
             <div class="ms-0 ms-md-1 no-break">Jul 25</div>
           </div>
@@ -122,17 +114,17 @@
             The Frost Duo
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           A fabulous jazz duo from the Scranton area.
           <a href="https://facebook.com/thefrostduo">The Frost Duo Facebook</a>
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-success bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-sunday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sun</div>
             <div class="ms-0 ms-md-1 no-break">Aug 2</div>
           </div>
@@ -141,17 +133,17 @@
             Cedar Routes
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           A Country/Folk Christian band from Allentown, PA.
           <a href="https://facebook.com/CedarRoutes">Cedar Routes Facebook</a>
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-success bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-sunday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sun</div>
             <div class="ms-0 ms-md-1 no-break">Aug 9</div>
           </div>
@@ -160,18 +152,18 @@
             Rick Marsi
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           Award-winning naturalist, author and photographer Rick Marsi will
           share the love of our natural world through photographs. His work
           reflects a deep, spiritual appreciation for nature.
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-success bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-sunday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sun</div>
             <div class="ms-0 ms-md-1 no-break">Aug 16</div>
           </div>
@@ -180,18 +172,18 @@
             Paul and Hannah Chesterton
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           Join us for an evening of songs with Dimock cottage owners Paul and
           Hannah Chesterton. Paul, a professional banjo player with
           international experience, will be joined by his wife, Hannah, in song.
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-success bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-sunday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sun</div>
             <div class="ms-0 ms-md-1 no-break">Aug 23</div>
           </div>
@@ -200,7 +192,7 @@
             Lisa Whitaker
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           Missionary with Youth With A Mission, Lisa will share about her
           recent 40-day journey along the ancient Silk Road. The Silk Road is
           known for its tremendous influence on commerce and communication
@@ -213,11 +205,11 @@
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-success bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-sunday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sun</div>
             <div class="ms-0 ms-md-1 no-break">Aug 30</div>
           </div>
@@ -226,7 +218,7 @@
             Patti Yoder
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           Patti Yoder's presentation will center on her 2012 strokes and the
           near-death experience that birthed <cite>Wisdom From Beyond</cite>,
           serving as the catalyst for a profound life shift. By bridging these
@@ -239,11 +231,11 @@
         </div>
       </div>
 
-      <div class="card shadow mb-5 border-0">
-        <div class="card-header bg-success bg-gradient fw-bold d-flex p-0 rounded-0">
-          <div class="bg-white text-success align-content-center py-2 px-2
+      <div class="card event-card mb-5">
+        <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
+          <div class="event-date event-date-sunday align-content-center py-2 px-2
                       px-md-4 col-3 col-lg-2 text-center d-flex flex-column
-                      flex-md-row justify-content-center shadow-sm">
+                      flex-md-row justify-content-center">
             <div>Sun</div>
             <div class="ms-0 ms-md-1 no-break">Sep 6</div>
           </div>
@@ -252,7 +244,7 @@
             Communion Service
           </div>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
           Communion Service with Julie Rosensteel, the Pastor in S. Montrose.
         </div>
       </div>

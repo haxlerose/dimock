@@ -5,18 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dimock Camp Meeting Ground</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <style>
-      /* Setting the navbar toggler icon stroke to Bootstrap success color using rgb values (25, 135, 84) */
-
-      .navbar-toggler-icon {
-          background-image: url(
-            "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(25, 135, 84, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"
-          );
-      }
-    </style>
+    <link href="site.css" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-white py-4">
+    <nav class="navbar navbar-expand-lg bg-white py-3">
       <div class="container-fluid">
         <a class="navbar-brand ps-0 ps-md-4 text-success fw-bold me-2" href="/">Dimock Camp Meeting Ground</a>
         <button class="navbar-toggler border border-2 border-success px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,26 +27,26 @@
     </nav>
 
     <div class="container">
-      <h1 class="my-5">Visit Us</h1>
+      <h1 class="page-title">Visit Us</h1>
 
       <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
         <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link text-black active" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="false">Directions</button>
+          <button class="nav-link active" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="true">Directions</button>
         </li>
         <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link text-black" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Attractions</button>
+          <button class="nav-link" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Attractions</button>
         </li>
         <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link text-black" id="cottages-tab" data-bs-toggle="tab" data-bs-target="#cottages-tab-pane" type="button" role="tab" aria-controls="cottages-tab-pane" aria-selected="true">Cottages</button>
+          <button class="nav-link" id="cottages-tab" data-bs-toggle="tab" data-bs-target="#cottages-tab-pane" type="button" role="tab" aria-controls="cottages-tab-pane" aria-selected="false">Cottages</button>
         </li>
       </ul>
 
-      <div class="card shadow border-0 my-5">
+      <div class="card content-card my-5">
         <div class="card-body">
           <div class="tab-content" id="tab-content">
             <div class="tab-pane fade show active" id="directions-tab-pane" role="tabpanel" aria-labelledby="directions-tab" tabindex="0">
               <h3 class="text-success fw-bold mb-4 text-center">Directions</h3>
-              <p class="fw-bold text-center">
+              <p class="address-callout fw-bold text-center p-3">
                 46 Dimock Camp Road, Springville, PA 18844
               </p>
               <p>
@@ -68,7 +60,7 @@
                 50 yards make another left onto the entrance road to the grounds. (We know that we're in Dimock, but
                 Google seems to think we're in Springville.)
               </p>
-              <div class="ratio ratio-16x9 mt-5">
+              <div class="ratio ratio-16x9 mt-4">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10012.510099066822!2d-75.911887573667!3d41.747763991583376!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89dacdf07495007b%3A0x12794bbe52cdf98!2sDimock+Camp+Meeting+Ground!5e0!3m2!1sen!2sus!4v1555552593979!5m2!1sen!2sus" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
               </div>
             </div>
@@ -76,7 +68,7 @@
             <!-- Nearby Attractions Content -->
             <div class="tab-pane fade" id="nearby-tab-pane" role="tabpanel" aria-labelledby="nearby-tab" tabindex="1">
               <h3 class="text-success fw-bold mb-4 text-center">Attractions</h3>
-              <button type="button" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#bears">Bears Near the Pond</button>
+              <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#bears">Bears Near the Pond</button>
 
               <p>
                 There is a boundary nature trail on the campground nearly a mile in length. Also, a companion
@@ -84,48 +76,48 @@
                 well as references to historic sites and events. Pick it up in the box at the pavilion.
               </p>
 
-              <ul class="list-unstyled mb-3">
-                <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/woodbourne-preserve-1.xml" target="_blank">Woodbourne Forest and Wildlife Sanctuary</a> (Dimock)</li>
-                <li><a href="http://en.wikipedia.org/wiki/Montrose_Historic_District_%28Montrose,_Pennsylvania%29" target="_blank">Historic Montrose</a></li>
-                <li><a href="http://www.oldmillvillage.org" target="_blank">Old Mill Village</a></li>
+              <ul class="attraction-list list-unstyled mb-3">
+                <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/woodbourne-preserve-1.xml" target="_blank" rel="noopener">Woodbourne Forest and Wildlife Sanctuary</a> (Dimock)</li>
+                <li><a href="http://en.wikipedia.org/wiki/Montrose_Historic_District_%28Montrose,_Pennsylvania%29" target="_blank" rel="noopener">Historic Montrose</a></li>
+                <li><a href="http://www.oldmillvillage.org" target="_blank" rel="noopener">Old Mill Village</a></li>
                 <!-- <li><a href="http://www.snakecreekalpacafarm.com/" target="_blank">Alpaca farm in Montrose</a></li> -->
-                <li><a href="http://en.wikipedia.org/wiki/Tunkhannock_Viaduct" target="_blank">Tunkhannock Viaduct</a> and <a href="https://historicbridges.org/bridges/browser/?bridgebrowser=pennsylvania/martinscreek/">Martins Creek Viaduct</a></li>
-                <li><a href="http://www.montroseblueberryfestival.net" target="_blank">The Blueberry Festival</a></li>
-                <li><a href="http://www.farmfair.org" target="_blank">Harford County Fair</a></li>
-                <li><a href="http://www.wyomingcountyfair.com" target="_blank">Wyoming County Fair</a></li>
-                <li><a href="https://www.howlandpreserve.com/" target="_blank">Howland Preserve</a> (Tunkhannock)</li>
-                <li><a href="https://www.dcnr.pa.gov/StateParks/FindAPark/SaltSpringsStatePark/Pages/default.aspx" target="_blank">Salt Springs State Park</a> (Montrose)</li>
-                <li><a href="http://www.kayaktheriver.com" target="_blank">Susquehanna Kayak and Canoe Rental</a></li>
-                <li>You can even fly over the Endless Mountains in a hot air balloon: <a href="http://www.weflyhotair.com/" target="_blank">Endless Mountains Hot Air Balloons</a> (Nicholson)</li>
-                <li><a href="http://www.endlessmountains.org/" target="_blank">Endless Mountains Visitors Bureau</a></li>
+                <li><a href="http://en.wikipedia.org/wiki/Tunkhannock_Viaduct" target="_blank" rel="noopener">Tunkhannock Viaduct</a> and <a href="https://historicbridges.org/bridges/browser/?bridgebrowser=pennsylvania/martinscreek/">Martins Creek Viaduct</a></li>
+                <li><a href="http://www.montroseblueberryfestival.net" target="_blank" rel="noopener">The Blueberry Festival</a></li>
+                <li><a href="http://www.farmfair.org" target="_blank" rel="noopener">Harford County Fair</a></li>
+                <li><a href="http://www.wyomingcountyfair.com" target="_blank" rel="noopener">Wyoming County Fair</a></li>
+                <li><a href="https://www.howlandpreserve.com/" target="_blank" rel="noopener">Howland Preserve</a> (Tunkhannock)</li>
+                <li><a href="https://www.dcnr.pa.gov/StateParks/FindAPark/SaltSpringsStatePark/Pages/default.aspx" target="_blank" rel="noopener">Salt Springs State Park</a> (Montrose)</li>
+                <li><a href="http://www.kayaktheriver.com" target="_blank" rel="noopener">Susquehanna Kayak and Canoe Rental</a></li>
+                <li>You can even fly over the Endless Mountains in a hot air balloon: <a href="http://www.weflyhotair.com/" target="_blank" rel="noopener">Endless Mountains Hot Air Balloons</a> (Nicholson)</li>
+                <li><a href="http://www.endlessmountains.org/" target="_blank" rel="noopener">Endless Mountains Visitors Bureau</a></li>
                 <li>And, of course, there is area antiquing</li>
               </ul>
 
               <h2>And Further Afield</h2>
-              <ul class="list-unstyled">
-                <li><a href="http://www.nps.gov/stea/index.htm" target="_blank">Steamtown National Historic Site</a> (Scranton)</li>
-                <li><a href="https://www.visitnepa.org/listing/lackawanna-coal-mine-tour/196/" target="_blank">Lackawanna Coal Mine</a> (Scranton)</li>
-                <li><a href="http://www.everhart-museum.org" target="_blank">Everhart Museum</a> (Scranton)</li>
-                <li><a href="http://www.anthracitemuseum.org" target="_blank">Anthracite Heritage Museum & Iron Furnaces</a> (Scranton)</li>
-                <li><a href="https://www.rossparkzoo.org" target="_blank">Binghamton Zoo at Ross Park</a> (Binghamton)</li>
-                <li><a href="http://www.roberson.org" target="_blank">Roberson Museum and Science Center</a> (Binghamton)</li>
-                <li><a href="https://www.dcnr.pa.gov/StateParks/FindAPark/WorldsEndStatePark/Pages/default.aspx" target="_blank">World's End State Park</a> (Forksville, PA)</li>
-                <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/florence-shelly-preserve.xml" target="_blank">Florence Shelly Preserve</a> (Thompson Borough, PA)</li>
+              <ul class="attraction-list list-unstyled">
+                <li><a href="http://www.nps.gov/stea/index.htm" target="_blank" rel="noopener">Steamtown National Historic Site</a> (Scranton)</li>
+                <li><a href="https://www.visitnepa.org/listing/lackawanna-coal-mine-tour/196/" target="_blank" rel="noopener">Lackawanna Coal Mine</a> (Scranton)</li>
+                <li><a href="http://www.everhart-museum.org" target="_blank" rel="noopener">Everhart Museum</a> (Scranton)</li>
+                <li><a href="http://www.anthracitemuseum.org" target="_blank" rel="noopener">Anthracite Heritage Museum &amp; Iron Furnaces</a> (Scranton)</li>
+                <li><a href="https://www.rossparkzoo.org" target="_blank" rel="noopener">Binghamton Zoo at Ross Park</a> (Binghamton)</li>
+                <li><a href="http://www.roberson.org" target="_blank" rel="noopener">Roberson Museum and Science Center</a> (Binghamton)</li>
+                <li><a href="https://www.dcnr.pa.gov/StateParks/FindAPark/WorldsEndStatePark/Pages/default.aspx" target="_blank" rel="noopener">World's End State Park</a> (Forksville, PA)</li>
+                <li><a href="http://www.nature.org/ourinitiatives/regions/northamerica/unitedstates/pennsylvania/placesweprotect/florence-shelly-preserve.xml" target="_blank" rel="noopener">Florence Shelly Preserve</a> (Thompson Borough, PA)</li>
               </ul>
             </div>
 
             <!-- Cottages For Sale content -->
-            <div class="tab-pane fade" id="cottages-tab-pane" role="tabpanel" aria-labelledby="lodging-tab" tabindex="2">
+            <div class="tab-pane fade" id="cottages-tab-pane" role="tabpanel" aria-labelledby="cottages-tab" tabindex="2">
               <h3 class="text-success fw-bold mb-4 text-center">Cottages For Sale</h3>
               <h5>Kevin Setzer's Cottage</h5>
               <p>
                 This cottage is currently for sale for $12,000. It features a new roof, new windows, and updated electrical installations. The plumbing is partially installed, and the foundation was redone 7 years ago. The cottage includes an addition built 15 years ago and offers potential for three bedrooms.
                 Prospective buyers must be approved by the Board of Directors and demonstrate financial capability to complete renovations. Ownership comes with a commitment to an annual land lease and taxes totaling approximately $850, participation in at least two Sunday evening services each season, and involvement in community maintenance efforts.
               </p>
-              <p>
+              <p class="address-callout p-3">
                 For inquiries, please contact <b>Kevin Setzer</b> at <b>570-396-6331</b>
               </p>
-              <button type="button" class="btn btn-secondary mb-3" data-bs-toggle="modal" data-bs-target="#kevinCottage">Kevin Setzer Cottage Photos</button>
+              <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#kevinCottage">Kevin Setzer Cottage Photos</button>
             </div>
           </div>
         </div>
@@ -137,7 +129,7 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="bearsLabel">A mother bear and her three cubs having dinner at some bird feeders near the pond</h1>
+            <h2 class="modal-title fs-5" id="bearsLabel">A mother bear and her three cubs having dinner at some bird feeders near the pond</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center">
@@ -201,7 +193,7 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="kevinCottageLabel">Photos of Kevin Setzer's Cottage</h1>
+            <h2 class="modal-title fs-5" id="kevinCottageLabel">Photos of Kevin Setzer's Cottage</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center">

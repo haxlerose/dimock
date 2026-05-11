@@ -5,18 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dimock Camp Meeting Ground</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <style>
-      /* Setting the navbar toggler icon stroke to Bootstrap success color using rgb values (25, 135, 84) */
-
-      .navbar-toggler-icon {
-          background-image: url(
-            "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(25, 135, 84, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"
-          );
-      }
-    </style>
+    <link href="site.css" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-white py-4">
+    <nav class="navbar navbar-expand-lg bg-white py-3">
       <div class="container-fluid">
         <a class="navbar-brand ps-0 ps-md-4 text-success fw-bold me-2" href="/">Dimock Camp Meeting Ground</a>
         <button class="navbar-toggler border border-2 border-success px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,18 +27,18 @@
     </nav>
 
     <div class="container">
-      <h1 class="my-5">About Us</h1>
+      <h1 class="page-title">About Us</h1>
 
         <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
           <li class="nav-item border-end pe-3" role="presentation">
-            <button class="nav-link text-black active" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab" aria-controls="history-tab-pane" aria-selected="true">Our History</button>
+            <button class="nav-link active" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab" aria-controls="history-tab-pane" aria-selected="true">Our History</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link text-black" id="landmark-tab" data-bs-toggle="tab" data-bs-target="#landmark-tab-pane" type="button" role="tab" aria-controls="landmark-tab-pane" aria-selected="false">Landmark Designation</button>
+            <button class="nav-link" id="landmark-tab" data-bs-toggle="tab" data-bs-target="#landmark-tab-pane" type="button" role="tab" aria-controls="landmark-tab-pane" aria-selected="false">Landmark Designation</button>
           </li>
         </ul>
 
-        <div class="card shadow border-0 my-5">
+        <div class="card content-card my-5">
           <div class="card-body">
             <div class="tab-content" id="tab-content">
               <div class="tab-pane fade show active" id="history-tab-pane" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
@@ -55,7 +47,7 @@
                 <p>
                   Chartered on August 15, 1877, as the Wyalusing District Camp Meeting Association, the Dimock Camp
                   Meeting Ground's inception was in September 1873. Congregations from the
-                  <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#wyalusing">Wyalusing District</button>
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#wyalusing">Wyalusing District</button>
                   of the Wyoming Conference of the Methodist-Episcopal Church (now part of the Susquehanna Conference of
                   the United Methodist Church) held a camp meeting near Meshoppen. This spurred the idea of a permanent
                   site. Starting in October 1873, under Rev. Luther Peck's guidance, potential sites along the
@@ -64,7 +56,7 @@
                 </p>
                 <p>
                   By April 14, 1875, with
-                  <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#ira-walker">Rev. Ira Walker</button>
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#ira-walker">Rev. Ira Walker</button>
                   as the District's presiding elder, Dimock was selected. Walker led an 11-member committee from the
                   Wyalusing District, covering Wyoming County and parts of Bradford, Luzerne, and Susquehanna counties
                   in Pennsylvania, to establish the Dimock Camp Meeting Ground. The committee members included: Rev.
@@ -94,14 +86,14 @@
                   To settle the debt, a decision was made to incorporate. A charter was subsequently lodged in the
                   Susquehanna County Courthouse. By the 1877 camp meeting, individuals had the opportunity to invest in
                   the venture by purchasing
-                  <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#stock">$10 shares of stock</button>.
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#stock">$10 shares of stock</button>.
                   While this granted them a voice at the annual board meetings, it did not offer financial dividends –
                   the true dividends were, presumably, of a spiritual nature.
                 </p>
                 <h5>Transformation and Modernization</h5>
                 <p>
                   Attendees traveled in horse-drawn buggies or by
-                  <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#train">train</button>
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#train">train</button>
                   opting to pitch tents or stay in boarding houses. Over time, tents transformed into about 100 cottages
                   surrounding a central square, creating an open-air amphitheater with a preacher's stand and benches.
                   It's hard to imagine accommodating 1,455 cars, 588 horses, and three motorcycles in 1918, but Dimock's
@@ -109,16 +101,16 @@
                 </p>
                 <p>
                   By the summer of 2011, events no longer spanned 7-to-10 consecutive days. Instead, services in the
-                  <button type="button" class="btn btn-secondary py-0" data-bs-toggle="modal" data-bs-target="#chapel">Chapel</button>
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#chapel">Chapel</button>
                   (completed in 1940) were held across ten consecutive Sunday evenings. Attendees were invited to step
                   back in time for a spirit-filled experience at Dimock. Beyond these services, the grounds also hosted
                   Sunday School training, family and children's camps, and served as a retreat for pastors, lay leaders,
                   and their families.
                 </p>
-                <div class="d-flex gap-3 mt-4">
-                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#famous">Famous Campers</button>
-                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#1800s">1800s Moments</button>
-                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#1900">1900+  Moments</button>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#famous">Famous Campers</button>
+                  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#moments1800s">1800s Moments</button>
+                  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#moments1900">1900+  Moments</button>
                 </div>
               </div>
 
@@ -131,7 +123,7 @@
                   its historical and cultural importance. Acting upon the recommendation of the Wyoming Annual Conference,
                   the Dimock Camp Meeting Ground was designated as a national heritage landmark.
                 </p>
-                <a href="http://gcah.org/directories/register-of-historic-sites" class="btn btn-secondary mt-4" target="_blank">UMC Historic Site Registry</A>
+                <a href="http://gcah.org/directories/register-of-historic-sites" class="btn btn-outline-success mt-4" target="_blank" rel="noopener">UMC Historic Site Registry</a>
               </div>
             </div>
           </div>
@@ -143,7 +135,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="wyalusingLabel">Wyalusing District</h1>
+            <h2 class="modal-title fs-5" id="wyalusingLabel">Wyalusing District</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -186,7 +178,7 @@
               saddlebags.  He would preach any day and any where - indoor or outdoor.  It
               might take him more than a month to traverse his circuit!
             </p>
-            <a href="http://en.wikipedia.org/wiki/Circuit_rider_(religious)" target="_blank" class="btn btn-secondary">More Details</A>
+            <a href="http://en.wikipedia.org/wiki/Circuit_rider_(religious)" target="_blank" rel="noopener" class="btn btn-outline-success">More Details</a>
           </div>
         </div>
       </div>
@@ -197,7 +189,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="iraWalkerLabel">Rev. Ira Walker</h1>
+            <h2 class="modal-title fs-5" id="iraWalkerLabel">Rev. Ira Walker</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -209,7 +201,7 @@
               Wyalusing District's camp meeting site to Dimock, a site his predecessor, the
               Rev. Luther peck, apparently had a hand in selecting.  As Presiding Elder,
               Walker oversaw the first three camp meetings at Dimock in 1875, 1876 and 1877.
-              <BR>
+              <br>
               He wrote: "Only a few weeks ago I entered the Dimmick [sic] Grove where a Camp
               meeting will soon be held.  How forcibly I was impressed with the
               appropriateness of the place for the beginnings of a Christian life.  There,
@@ -218,7 +210,7 @@
               those grand old trees, can there be found a better altar?"  (Aug. 11, 1875)
             </p>
             <div class="d-flex flex-column text-center">
-              <img src="walker.jpg" class="img-fluid rounded shadow">
+              <img src="walker.jpg" class="img-fluid rounded">
               Orcelia (Barnes) Walker and Rev. Ira Walker
             </div>
           </div>
@@ -231,7 +223,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="stockLabel">$10 Shares of Stock</h1>
+            <h2 class="modal-title fs-5" id="stockLabel">$10 Shares of Stock</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -241,7 +233,7 @@
               headed up the committee looking for a permanent campground site from September
               1873 to April 1875.  The president then was the Rev. Joshua S. Lewis, for whom
               the Lewis Lodge on these grounds is named.
-            <p>
+            </p>
             <p>
               Incidentally, the name Wyalusing District Campmeeting Association was chosen
               because it had been set up initially to serve folks from parts of Bradford,
@@ -251,7 +243,7 @@
               decided to dissolve the geographical entity known as the Wyalusing District.
             </p>
             <div class="text-center">
-              <img src="stock.jpg" class="img-fluid rounded shadow">
+              <img src="stock.jpg" class="img-fluid rounded">
             </div>
           </div>
         </div>
@@ -263,11 +255,11 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="trainLabel">Train and Railway Ticket</h1>
+            <h2 class="modal-title fs-5" id="trainLabel">Train and Railway Ticket</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center">
-            <img src="train.jpg" class="img-fluid rounded shadow">
+            <img src="train.jpg" class="img-fluid rounded">
           </div>
         </div>
       </div>
@@ -278,7 +270,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="famousLabel">Famous Campers</h1>
+            <h2 class="modal-title fs-5" id="famousLabel">Famous Campers</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -293,7 +285,7 @@
               in Upland, Indiana, is named in his honor.
             </p>
             <div class="text-center mb-5">
-              <img src="taylor.jpg" class="img-fluid rounded shadow">
+              <img src="taylor.jpg" class="img-fluid rounded">
             </div>
 
             <h4>Daniel Brink Towner</h4>
@@ -312,7 +304,7 @@
               United Methodist Hymnal.
             </p>
             <div class="text-center mb-5">
-              <img src="towner.jpg" class="img-fluid rounded shadow">
+              <img src="towner.jpg" class="img-fluid rounded">
             </div>
 
             <h4>Cornelia Bryce Pinchot</h4>
@@ -331,7 +323,7 @@
               orphaned children of former slaves in Charleston, South Carolina.
             </p>
             <div class="text-center">
-              <img src="pinchot.jpg" class="img-fluid rounded shadow">
+              <img src="pinchot.jpg" class="img-fluid rounded">
             </div>
           </div>
         </div>
@@ -343,22 +335,22 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="chapelLabel">Chapel</h1>
+            <h2 class="modal-title fs-5" id="chapelLabel">Chapel</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center">
-            <img src="chapel.jpg" class="img-fluid rounded shadow">
+            <img src="chapel.jpg" class="img-fluid rounded">
           </div>
         </div>
       </div>
     </div>
 
     <!-- 1800s Great Moments -->
-    <div class="modal fade px-1" id="1800s" tabindex="-1" aria-labelledby="1800sLabel" aria-hidden="true">
+    <div class="modal fade px-1" id="moments1800s" tabindex="-1" aria-labelledby="moments1800sLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="1800sLabel">1800s Great Moments </h1>
+            <h2 class="modal-title fs-5" id="moments1800sLabel">1800s Great Moments </h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -433,7 +425,7 @@
             </p>
 
             <div class="d-flex flex-column text-center">
-              <img src="meeting.jpg" class="img-fluid rounded shadow">
+              <img src="meeting.jpg" class="img-fluid rounded">
               Camp Meeting in the 1890s
             </div>
           </div>
@@ -442,11 +434,11 @@
     </div>
 
     <!-- 1900+ Great Moments -->
-    <div class="modal fade px-1" id="1900" tabindex="-1" aria-labelledby="1900Label" aria-hidden="true">
+    <div class="modal fade px-1" id="moments1900" tabindex="-1" aria-labelledby="moments1900Label" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="1900Label">1900+ Great Moments </h1>
+            <h2 class="modal-title fs-5" id="moments1900Label">1900+ Great Moments </h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
