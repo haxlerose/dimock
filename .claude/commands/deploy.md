@@ -12,7 +12,8 @@ Upload files changed in the last commit (or all files) to the SFTP server.
    - Default: files changed in the last commit — `git diff-tree --no-commit-id -r --name-only HEAD`
    - If user said "all", "full", or "sync all": every tracked file — `git ls-files`
    - Exclude files that don't exist locally (deleted in last commit)
-   - Always exclude files in the `backup/` folder
+   - Always exclude files in the `backup/` folder and the `checks/` folder — `checks/`
+     is the local verification harness and must never reach the web server
 
 3. Show the file list and ask for confirmation before uploading.
 

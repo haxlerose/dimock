@@ -3,3 +3,6 @@
 .env.*
 !.env.example
 docs/
+
+# Screenshots from checks/run.sh --shots are review artifacts, not source.
+docs/screens/

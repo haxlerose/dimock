@@ -41,11 +41,11 @@ the module is CommonJS, so use `createRequire` rather than `import { chromium }`
 `launch()` must be passed `executablePath: process.env.PW_EXECUTABLE` because the
 installed browser revision differs from the module's pinned one.
 
-> **Not built yet.** The harness arrives in Phase 0 of `docs/redesign-plan.md`, which
-> contains all four files in full. Until then, verify by hand: run
-> `python3 -m http.server 8811`, then check every page you changed at 1440 and 390 for
-> horizontal overflow, console errors, working tabs and modals, and a functioning
-> mobile nav.
+The harness is four files, each with one job: `contrast.mjs` (WCAG arithmetic, no
+browser), `specs.mjs` (the rules — **the only file that grows each phase**),
+`site-check.mjs` (the runner), and `run.sh` (server up, checks, server down). Adding a
+rule means editing `specs.mjs` only. Screenshots land in `docs/screens/`, which is
+gitignored.
 
 ## Stack
 
@@ -62,19 +62,20 @@ installed browser revision differs from the module's pinned one.
 
 | File | Scope |
 |------|-------|
-| `site.css` | The live shared stylesheet. Bootstrap-green tokens, current nav/hero/card/tab styling. Linked by `about`, `services`, `events`, `visit`, `contact`. |
-| `prototype.css` | Homepage-only, **`homepage-prototype` branch only**. The approved new design system: pine/ochre/cream tokens, Fraunces + Inter, `.eyebrow` / `.statement` / `.figure-tile` / `.pullquote` / `.milestones` / `.site-nav` / `.site-footer`. |
+| `site.css` | The live shared stylesheet, linked by all six pages. Bootstrap-green tokens, current nav/hero/card/tab styling. |
+| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. The approved new design system: pine/ochre/cream tokens, Fraunces + Inter, `.eyebrow` / `.statement` / `.figure-tile` / `.pullquote` / `.milestones` / `.site-nav` / `.site-footer`. |
 
-The homepage links `prototype.css` *instead of* `site.css` so the other five pages
-stayed untouched during review. **That split is review scaffolding and should not
-survive implementation** — the new system is meant to land in `site.css` across all
-six pages before any single page is restructured.
+`prototype.css` is scaffolding, not a second live stylesheet: only
+`index-prototype.html` links it, and nothing links to that page. The new system lands
+in `site.css` across all six pages (Phases 1–4) before any single page is
+restructured; Phase 9 deletes both prototype files.
 
 ## Pages
 
 | File | Content |
 |------|---------|
-| `index.html` | On `main`: hero + mission/vision cards + heritage. On `homepage-prototype`: rebuilt editorial layout — hero, next-service band, statements, photography, heritage + milestones, visit strip, footer. |
+| `index.html` | Hero + mission/vision cards + heritage. Phase 5 rebuilds it. |
+| `index-prototype.html` | First-draft editorial homepage, reference only — not linked, not deployed. |
 | `about.html` | Tabbed: history + landmark designation; many modals |
 | `services.html` | Tabbed: camp meeting / rekindling / prayer; modals |
 | `events.html` | Season schedule — one card per event |
