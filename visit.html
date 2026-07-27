@@ -44,27 +44,27 @@
       </div>
     </nav>
 
-    <div class="container">
-      <h1 class="page-title">Visit Us</h1>
+    <div class="section">
+      <div class="container container-narrow">
+        <h1 class="page-title">Visit Us</h1>
 
-      <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
-        <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link active" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="true">Directions</button>
-        </li>
-        <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Attractions</button>
-        </li>
-        <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link" id="cottages-tab" data-bs-toggle="tab" data-bs-target="#cottages-tab-pane" type="button" role="tab" aria-controls="cottages-tab-pane" aria-selected="false">Cottages</button>
-        </li>
-      </ul>
+        <ul class="nav nav-underline" id="tab-list" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="directions-tab" data-bs-toggle="tab" data-bs-target="#directions-tab-pane" type="button" role="tab" aria-controls="directions-tab-pane" aria-selected="true">Directions</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nearby-tab" data-bs-toggle="tab" data-bs-target="#nearby-tab-pane" type="button" role="tab" aria-controls="nearby-tab-pane" aria-selected="false">Attractions</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cottages-tab" data-bs-toggle="tab" data-bs-target="#cottages-tab-pane" type="button" role="tab" aria-controls="cottages-tab-pane" aria-selected="false">Cottages</button>
+          </li>
+        </ul>
 
-      <div class="card content-card my-5">
-        <div class="card-body">
-          <div class="tab-content" id="tab-content">
+          <div class="tab-content pt-5" id="tab-content">
             <div class="tab-pane fade show active" id="directions-tab-pane" role="tabpanel" aria-labelledby="directions-tab" tabindex="0">
-              <h3 class="text-success fw-bold mb-4 text-center">Directions</h3>
-              <p class="address-callout fw-bold text-center p-3">
+              <p class="eyebrow">Finding us</p>
+              <h2 class="mb-4">Directions</h2>
+              <p class="address-callout fw-bold p-3">
                 46 Dimock Camp Road, Springville, PA 18844
               </p>
               <p>
@@ -85,8 +85,11 @@
 
             <!-- Nearby Attractions Content -->
             <div class="tab-pane fade" id="nearby-tab-pane" role="tabpanel" aria-labelledby="nearby-tab" tabindex="1">
-              <h3 class="text-success fw-bold mb-4 text-center">Attractions</h3>
-              <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#bears">Bears Near the Pond</button>
+              <p class="eyebrow">In the area</p>
+              <h2 class="mb-4">Attractions</h2>
+              <p class="mb-4">
+                <button type="button" class="btn-pine-outline" data-bs-toggle="modal" data-bs-target="#bears">Bears Near the Pond</button>
+              </p>
 
               <p>
                 There is a boundary nature trail on the campground nearly a mile in length. Also, a companion
@@ -111,7 +114,7 @@
                 <li>And, of course, there is area antiquing</li>
               </ul>
 
-              <h2>And Further Afield</h2>
+              <h3 class="mt-5">And Further Afield</h3>
               <ul class="attraction-list list-unstyled">
                 <li><a href="http://www.nps.gov/stea/index.htm" target="_blank" rel="noopener">Steamtown National Historic Site</a> (Scranton)</li>
                 <li><a href="https://www.visitnepa.org/listing/lackawanna-coal-mine-tour/196/" target="_blank" rel="noopener">Lackawanna Coal Mine</a> (Scranton)</li>
@@ -126,7 +129,8 @@
 
             <!-- Cottages For Sale content -->
             <div class="tab-pane fade" id="cottages-tab-pane" role="tabpanel" aria-labelledby="cottages-tab" tabindex="2">
-              <h3 class="text-success fw-bold mb-4 text-center">Cottages For Sale</h3>
+              <p class="eyebrow">On the grounds</p>
+              <h2 class="mb-4">Cottages For Sale</h2>
               <h5>Kevin Setzer's Cottage</h5>
               <p>
                 This cottage is currently for sale for $12,000. It features a new roof, new windows, and updated electrical installations. The plumbing is partially installed, and the foundation was redone 7 years ago. The cottage includes an addition built 15 years ago and offers potential for three bedrooms.
@@ -135,10 +139,11 @@
               <p class="address-callout p-3">
                 For inquiries, please contact <b>Kevin Setzer</b> at <b>570-396-6331</b>
               </p>
-              <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#kevinCottage">Kevin Setzer Cottage Photos</button>
+              <p class="mb-0">
+                <button type="button" class="btn-pine-outline" data-bs-toggle="modal" data-bs-target="#kevinCottage">Kevin Setzer Cottage Photos</button>
+              </p>
             </div>
           </div>
-        </div>
       </div>
     </div>
 

@@ -44,27 +44,27 @@
       </div>
     </nav>
 
-    <div class="container">
-      <h1 class="page-title">Services</h1>
+    <div class="section">
+      <div class="container container-narrow">
+        <h1 class="page-title">Services</h1>
 
-      <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
-        <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link active" id="meeting-tab" data-bs-toggle="tab" data-bs-target="#meeting-tab-pane" type="button" role="tab" aria-controls="meeting-tab-pane" aria-selected="true">Camp Meeting</button>
-        </li>
-        <li class="nav-item border-end pe-3" role="presentation">
-          <button class="nav-link" id="rekindling-tab" data-bs-toggle="tab" data-bs-target="#rekindling-tab-pane" type="button" role="tab" aria-controls="rekindling-tab-pane" aria-selected="false">Rekindling</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="prayer-tab" data-bs-toggle="tab" data-bs-target="#prayer-tab-pane" type="button" role="tab" aria-controls="prayer-tab-pane" aria-selected="false">A Prayer</button>
-        </li>
-      </ul>
+        <ul class="nav nav-underline" id="tab-list" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="meeting-tab" data-bs-toggle="tab" data-bs-target="#meeting-tab-pane" type="button" role="tab" aria-controls="meeting-tab-pane" aria-selected="true">Camp Meeting</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rekindling-tab" data-bs-toggle="tab" data-bs-target="#rekindling-tab-pane" type="button" role="tab" aria-controls="rekindling-tab-pane" aria-selected="false">Rekindling</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="prayer-tab" data-bs-toggle="tab" data-bs-target="#prayer-tab-pane" type="button" role="tab" aria-controls="prayer-tab-pane" aria-selected="false">A Prayer</button>
+          </li>
+        </ul>
 
-      <div class="card content-card my-5">
-        <div class="card-body">
-          <div class="tab-content" id="tab-content">
+        <div class="tab-content pt-5" id="tab-content">
             <!-- Camp Meeting Content -->
             <div class="tab-pane fade show active" id="meeting-tab-pane" role="tabpanel" aria-labelledby="meeting-tab" tabindex="0">
-              <h3 class="text-success fw-bold mb-4 text-center">What is a Camp Meeting?</h3>
+              <p class="eyebrow">The tradition</p>
+              <h2 class="mb-4">What is a Camp Meeting?</h2>
               <p>
                 In the late 1700s, a tradition was begun in America in which individuals eager
                 to spread their Christian faith gathered in revival-styled services for days
@@ -91,13 +91,18 @@
                 Conference.  The Wyalusing District was dissolved in 1879, but camp meetings
                 continued.
               </p>
-              <button type="button" class="btn btn-outline-success me-2 mb-2" data-bs-toggle="modal" data-bs-target="#poster">1936 Camp Meeting Poster</button>
-              <button type="button" class="btn btn-outline-success mb-2" data-bs-toggle="modal" data-bs-target="#photo">1890s Camp Meeting Photo</button>
+              <p class="mb-0">
+                See the
+                <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#poster">1936 camp meeting poster</button>
+                and an
+                <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#photo">1890s camp meeting photograph</button>.
+              </p>
             </div>
 
             <!-- Rekindling Content -->
             <div class="tab-pane fade" id="rekindling-tab-pane" role="tabpanel" aria-labelledby="rekindling-tab" tabindex="1">
-              <h3 class="text-success fw-bold mb-4 text-center">A Great Place to Rekindle Your Spirit</h3>
+              <p class="eyebrow">At Dimock today</p>
+              <h2 class="mb-4">A Great Place to Rekindle Your Spirit</h2>
               <p>Attend the Sunday evening chapel programs.</p>
               <p>Hear inspirational preaching, musical groups, or witness religious rama.</p>
               <p>Engage in an ecumenical spirit of friendship and fellowship around a table.</p>
@@ -120,7 +125,7 @@
 
             <!-- A Prayer Content -->
             <div class="tab-pane fade text-center" id="prayer-tab-pane" role="tabpanel" aria-labelledby="prayer-tab" tabindex="2">
-              <h3 class="text-success fw-bold mb-4 text-center">A Prayer</h3>
+              <h2 class="mb-4">A Prayer</h2>
               <p>
                 O God, we lift up before you now the life and mission of the Dimock Campmeeting. As sojourners upon this
                 sacred ground, we are grateful for the vision efforts and memory of those who have gone before. Enable
@@ -134,7 +139,6 @@
               </div>
             </div>
             <!-- End tab content -->
-          </div>
         </div>
       </div>
     </div>

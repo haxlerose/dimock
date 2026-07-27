@@ -73,8 +73,8 @@ gitignored.
 
 | File | Scope |
 |------|-------|
-| `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, `.site-nav` / `.site-footer` / `.container-narrow`, current hero/card/tab styling. |
-| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. Still holds the components `site.css` has not adopted yet: `.eyebrow` / `.statement` / `.figure-tile` / `.pullquote` / `.milestones` (Phase 4). |
+| `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, the shared shell, and the whole component vocabulary. |
+| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. `site.css` has now adopted every component from it; what remains here is the prototype's own homepage layout (`.hero__*`, `.next-service`, `.grove`, `.visit`), which Phase 5 ports. |
 
 `prototype.css` is scaffolding, not a second live stylesheet: only
 `index-prototype.html` links it, and nothing links to that page. The new system lands
@@ -85,7 +85,7 @@ restructured; Phase 9 deletes both prototype files.
 
 | File | Content |
 |------|---------|
-| `index.html` | Hero + mission/vision cards + heritage. Phase 5 rebuilds it. |
+| `index.html` | Hero + mission/vision statements + heritage. Phase 5 rebuilds it. |
 | `index-prototype.html` | First-draft editorial homepage, reference only — not linked, not deployed. |
 | `about.html` | Tabbed: history + landmark designation; many modals |
 | `services.html` | Tabbed: camp meeting / rekindling / prayer; modals |
@@ -107,8 +107,9 @@ never be the only carrier of meaning — Sunday events are pine, Saturday ochre,
 both spell the day out in text. See design direction §5 for the full token list and
 the contrast-safe pairings — use the custom properties, never raw hex.
 
-`--bs-danger-rgb` is temporarily mapped to ochre so the Saturday event headers are
-not red; Phase 4 removes `bg-danger` from those cards and restores it to a real red.
+`--bs-danger-rgb` is deliberately **not** remapped. No element uses a danger class any
+more, so the token keeps Bootstrap's red and means "error" again. Do not spend it on
+decoration.
 
 ## Typography
 
@@ -116,7 +117,7 @@ Landed in `site.css` (Phase 2). Fraunces for `h1`–`h4` and `.navbar-brand`, In
 everything else. Body is `1.0625rem` / `1.7` — **a floor, not a target; never reduce
 it for visual balance.** Headings are weight 600 at `line-height: 1.12` with fluid
 `clamp()` sizes. `--measure` (66ch) caps line length for sustained reading, applied
-via the `.measure` class and the `.tab-pane > *` and `.notice > *` rules. Long-form
+via the `.measure` class and the `.tab-pane`, `.notice`, and `.event-body` rules. Long-form
 prose is left-aligned everywhere; the prayer on `services.html` is the one
 deliberate exception.
 
@@ -179,44 +180,57 @@ Full-bleed image with overlay; sizing and text shadow come from `site.css`
 The approved direction moves hero text to bottom-left over a gradient scrim
 (`.hero__*` in `prototype.css`).
 
+## Component vocabulary
+
+Landed in `site.css` (Phase 4), ported from `prototype.css`. **Check this list before
+inventing a component.** `.section` (page band) · `.section-paper` (the alternating
+off-white band) · `.container-narrow` (1180px) · `.eyebrow` (small ochre caps over a
+short rule, opens a section) · `.lede` · `.measure` · `.statement` + `.statement__label`
++ `.statement__text` (what mission/vision look like instead of filled cards) ·
+`.figure-tile` · `.pullquote` · `.milestones` · `.btn-pine` / `.btn-pine-outline` (the
+only two button styles) · `.inline-reference` · `.notice` · `.no-break`.
+
+Headings inside a `.section` take `--pine-deep` from a single rule; the ochre in a band
+is carried by the eyebrow above the heading. Every `a`, `button`, `.btn`, and
+`[tabindex]` gets a 2px pine focus ring — the rule uses `:is()` so it outweighs
+Bootstrap's own `.btn:focus-visible`. A cross-origin `<iframe>` cannot be reached this
+way (focus moves into the frame's own document), which is why the map is exempt.
+
+**Never reintroduce:** filled card headers (`bg-success` / `bg-danger` + white text),
+`bg-gradient`, `btn-secondary`, heavy shadows, centered long-form prose, or color as
+the only carrier of meaning.
+
 ## Events card pattern
 
-Each event is a card. Header fill = green (Sunday) or red (Saturday); the date
-block color comes from `.event-date-sunday` / `.event-date-saturday`.
+Each event is a flat block — a thin colored left rule, the day and date in Fraunces,
+the title as an `<h2>`, the description in Inter. No card, no header fill.
 
 ```html
-<div class="card event-card mb-5">
-  <div class="card-header bg-success fw-bold d-flex p-0 rounded-0">
-    <div class="event-date event-date-sunday align-content-center py-2 px-2 px-md-4
-                col-3 col-lg-2 text-center d-flex flex-column flex-md-row
-                justify-content-center">
-      <div>Sun</div>
-      <div class="ms-0 ms-md-1 no-break">Aug 2</div>
-    </div>
-    <div class="text-white align-content-center py-2 px-3 px-md-4 col-9 col-lg-10">
-      Event Title
-    </div>
-  </div>
-  <div class="card-body">Description</div>
-</div>
+<article class="event-card event-card-sunday mb-4">
+  <p class="event-day">Sun &middot; <span class="no-break">Aug 2</span></p>
+  <h2 class="event-title">Event Title</h2>
+  <p class="event-body">Description</p>
+</article>
 ```
 
-Both the filled header and the red/green split are slated for replacement — see
-design direction §5 and §9. `class="no-break"` is used here but not yet defined in
-`site.css`.
+`event-card-sunday` tints the rule and day pine, `event-card-saturday` ochre — but the
+day is always spelled out, so stripping every color from the page loses nothing. The
+`day-conveyed-in-text` spec enforces that.
 
 ## Tab pattern (about, services, visit)
 
-Tabs use `nav-underline`; content lives inside a `card content-card my-5`.
-Converting these to anchored sections is recommended but not yet agreed — see
-design direction §9. Note the tab panes on `about`, `services`, and `visit`
-currently carry positive `tabindex` values, which breaks keyboard order.
+Tabs use `nav-underline` with the same ochre active underline as the site nav; the
+panes sit in a `.section` + `.container-narrow`, with `.tab-pane` capping the reading
+column at `--measure`. Each pane opens with an `.eyebrow` above a left-aligned `<h2>`.
+Phase 7 replaces the tabs with anchored sections. Note the panes still carry positive
+`tabindex` values, which breaks keyboard order — Phase 7 removes them.
 
 ## Modal pattern
 
 Inline text triggers use `class="inline-reference"` (a dotted-underline text
-button styled in `site.css`), not `btn btn-secondary`. Image-only modals use
-`modal-xl`; text modals use the default size.
+button styled in `site.css`) — never a `btn`. `.btn-pine-outline` is for genuine
+standalone actions only: the photo-gallery openers on `visit.html` and the two
+external links. Image-only modals use `modal-xl`; text modals use the default size.
 
 ## Working rules
 

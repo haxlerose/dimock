@@ -27,15 +27,15 @@
   --measure:     66ch;
 
   /* Bootstrap adopts the palette. site.css loads after Bootstrap, so redefining
-     these recolours .text-success, .bg-success, .border-success, .text-danger,
-     .bg-danger and links across all six pages without touching any HTML class.
-     --bs-danger-rgb is mapped to ochre only until Phase 4 removes bg-danger
-     from the Saturday event cards; it then returns to a real red. */
+     these recolours .text-success, .bg-success, .border-success and links
+     across all six pages without touching any HTML class.
+     --bs-danger-rgb is deliberately NOT remapped: no element on the site uses
+     a danger class any more, so the token is left as Bootstrap's red and means
+     "error" again. */
   --bs-body-bg: var(--cream);
   --bs-body-color: var(--ink);
   --bs-border-color: var(--rule);
   --bs-success-rgb: 44, 87, 65;      /* --pine */
-  --bs-danger-rgb: 138, 86, 24;      /* --ochre-ink */
   --bs-link-color-rgb: 31, 64, 48;   /* --pine-deep */
   --bs-link-hover-color-rgb: 44, 87, 65;
   --bs-emphasis-color: var(--ink);
@@ -92,6 +92,10 @@ h4 {
 /* Caps line length for sustained reading. */
 .measure {
   max-width: var(--measure);
+}
+
+.no-break {
+  white-space: nowrap;
 }
 
 a {
@@ -240,13 +244,192 @@ img {
   padding-top: 1.5rem;
 }
 
+/* ---------------------------------------------------------------------------
+   The component vocabulary. These replace the framework's filled headers and
+   shadowed boxes; docs/design-direction.md §7 is the catalogue. Check this list
+   before inventing anything new.
+   --------------------------------------------------------------------------- */
+
+/* A page band. Sections alternate cream and paper, separated by a hairline —
+   never by a shadow. */
+.section {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.section-paper {
+  background: var(--paper);
+  border-block: 1px solid var(--rule);
+}
+
+/* Headings inside a band sit in pine; the ochre in the band is carried by the
+   eyebrow above them. */
+.section h2,
+.section h3 {
+  color: var(--pine-deep);
+}
+
+/* Small ochre caps over a short rule. Opens a section. */
+.eyebrow {
+  color: var(--ochre-ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  background: var(--ochre);
+  content: "";
+  display: block;
+  height: 2px;
+  margin-bottom: 0.85rem;
+  width: 2.5rem;
+}
+
+/* A hairline-topped block of light serif. This is what mission and vision look
+   like instead of two filled cards. */
+.statement {
+  border-top: 1px solid var(--rule);
+  padding-top: 1.75rem;
+}
+
+.statement__label {
+  color: var(--ochre-ink);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+}
+
+.statement__text {
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 400;
+  line-height: 1.42;
+  margin: 0;
+}
+
+/* The standard way to place a photograph. */
+.figure-tile {
+  margin: 0;
+}
+
+.figure-tile img {
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  box-shadow: var(--shadow-soft);
+  display: block;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.figure-tile figcaption {
+  color: var(--muted);
+  font-size: 0.87rem;
+  line-height: 1.5;
+  padding-top: 0.7rem;
+}
+
+.pullquote {
+  border-left: 2px solid var(--ochre);
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2.1vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 2rem 0;
+  padding-left: 1.4rem;
+}
+
+.pullquote cite {
+  color: var(--muted);
+  display: block;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 0.85rem;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  padding-top: 0.85rem;
+}
+
+.milestones {
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 1.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+}
+
+.milestone__year {
+  color: var(--pine);
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.milestone__label {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0.55rem 0 0;
+}
+
+/* The only two button styles. Reserve them for real actions — a trigger that
+   sits inside a sentence is an .inline-reference, not a button. */
+.btn-pine,
+.btn-pine-outline {
+  border-radius: 2rem;
+  display: inline-block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.7rem 1.6rem;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn-pine {
+  background: var(--pine);
+  border: 1px solid var(--pine);
+  color: #fff;
+}
+
+.btn-pine:hover,
+.btn-pine:focus {
+  background: var(--pine-deep);
+  border-color: var(--pine-deep);
+  color: #fff;
+}
+
+.btn-pine-outline {
+  background: transparent;
+  border: 1px solid var(--pine);
+  color: var(--pine-deep);
+}
+
+.btn-pine-outline:hover,
+.btn-pine-outline:focus {
+  background: var(--pine);
+  color: #fff;
+}
+
+/* :is() takes the specificity of its heaviest argument, so this clears
+   Bootstrap's own .btn:focus-visible rule instead of losing to it. The list is
+   everything that can take keyboard focus here — the map iframe included. */
+:is(a, button, .btn, [tabindex]):focus-visible {
+  border-radius: 0.2rem;
+  outline: 2px solid var(--pine);
+  outline-offset: 3px;
+}
+
 .page-title {
   color: var(--pine-deep);
   margin-top: 3rem;
   margin-bottom: 1.75rem;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 960px;
 }
 
 .hero {
@@ -273,58 +456,25 @@ img {
   line-height: 1.3;
 }
 
-.dimock-card {
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  box-shadow: var(--shadow-soft);
-}
-
-.dimock-card .card-header {
-  background: var(--pine-deep);
-}
-
-.dimock-card .card-body,
-.content-card .card-body,
-.event-card .card-body {
-  background: var(--paper);
-}
-
 .heritage-band {
   background: var(--paper);
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
 
-.content-card {
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  box-shadow: var(--shadow-soft);
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 960px;
-}
-
-.content-card.my-5 {
-  margin-top: 2rem !important;
-}
-
-.content-card .card-body {
-  padding: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .content-card .card-body {
-    padding: 2.5rem;
-  }
-}
-
 /* One reading column for the whole pane, not one per child: `ch` resolves
    against each element's own font-size, so per-child caps left the headings
-   hanging outside the paragraphs' left edge. */
+   hanging outside the paragraphs' left edge. The column is flush left with the
+   page title above it — a centred column beside a left-aligned heading reads
+   as a mistake. */
 .tab-pane {
-  margin-left: auto;
-  margin-right: auto;
   max-width: var(--measure);
+}
+
+/* The prayer is the one deliberate exception to left-aligned prose. Its column
+   is centred too — centred text in a flush-left column reads as a mistake. */
+.tab-pane.text-center {
+  margin-inline: auto;
 }
 
 /* A sub-heading belongs to what follows it, not to what precedes it. */
@@ -336,20 +486,27 @@ img {
   margin-top: 0;
 }
 
-.nav-underline .nav-link {
-  color: var(--ink);
+/* The in-page tabs take the same ochre underline as the site nav, so "where am
+   I" looks the same in both places. */
+.nav-underline {
+  --bs-nav-underline-gap: 2rem;
+  --bs-nav-underline-link-active-color: var(--pine-deep);
+
+  border-bottom: 1px solid var(--rule);
 }
 
-.nav-underline {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 960px;
+.nav-underline .nav-link {
+  color: var(--ink);
 }
 
 .nav-underline .nav-link:hover,
 .nav-underline .nav-link:focus,
 .nav-underline .nav-link.active {
   color: var(--pine-deep);
+}
+
+.nav-underline .nav-link.active {
+  border-bottom-color: var(--ochre);
 }
 
 .nav-underline .nav-link:focus {
@@ -409,6 +566,9 @@ img {
   border: 1px solid var(--rule);
   border-left: 0.35rem solid var(--ochre);
   color: var(--ink);
+  /* The box tracks its own text: capping only the children left a stretched
+     panel with 400px of nothing in it. */
+  max-width: calc(var(--measure) + 3rem);
 }
 
 .notice > p,
@@ -416,22 +576,46 @@ img {
   max-width: var(--measure);
 }
 
+/* An event is a thin rule, a date, and a heading — no box, no filled header.
+   The day is tinted, but it is also spelled out, so removing every colour from
+   the page loses nothing. */
 .event-card {
-  border: 1px solid var(--rule);
-  box-shadow: var(--shadow-soft);
+  border-left: 2px solid var(--rule);
+  padding-left: clamp(1rem, 3vw, 1.75rem);
 }
 
-.event-date {
-  background: var(--paper);
-  box-shadow: inset -1px 0 0 var(--rule);
+.event-day {
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.15rem;
 }
 
-.event-date-sunday {
-  color: var(--pine-deep);
+.event-card-sunday {
+  border-left-color: var(--pine);
 }
 
-.event-date-saturday {
+.event-card-sunday .event-day {
+  color: var(--pine);
+}
+
+.event-card-saturday {
+  border-left-color: var(--ochre);
+}
+
+.event-card-saturday .event-day {
   color: var(--ochre-ink);
+}
+
+.event-title {
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  margin-bottom: 0.75rem;
+}
+
+.event-body {
+  margin-bottom: 0;
+  max-width: var(--measure);
 }
 
 .address-callout {
@@ -496,5 +680,12 @@ img {
 
   .hero {
     min-height: 390px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

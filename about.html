@@ -44,11 +44,12 @@
       </div>
     </nav>
 
-    <div class="container">
-      <h1 class="page-title">About Us</h1>
+    <div class="section">
+      <div class="container container-narrow">
+        <h1 class="page-title">About Us</h1>
 
-        <ul class="nav nav-underline me-3" id="tab-list" role="tablist">
-          <li class="nav-item border-end pe-3" role="presentation">
+        <ul class="nav nav-underline" id="tab-list" role="tablist">
+          <li class="nav-item" role="presentation">
             <button class="nav-link active" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab" aria-controls="history-tab-pane" aria-selected="true">Our History</button>
           </li>
           <li class="nav-item" role="presentation">
@@ -56,11 +57,10 @@
           </li>
         </ul>
 
-        <div class="card content-card my-5">
-          <div class="card-body">
-            <div class="tab-content" id="tab-content">
+            <div class="tab-content pt-5" id="tab-content">
               <div class="tab-pane fade show active" id="history-tab-pane" role="tabpanel" aria-labelledby="history-tab" tabindex="0">
-                <h3 class="text-success fw-bold mb-4 text-center">Dimock's History</h3>
+                <p class="eyebrow">Since 1877</p>
+                <h2 class="mb-4">Dimock's History</h2>
                 <h5>Founding and Early Organization</h5>
                 <p>
                   Chartered on August 15, 1877, as the Wyalusing District Camp Meeting Association, the Dimock Camp
@@ -125,27 +125,29 @@
                   Sunday School training, family and children's camps, and served as a retreat for pastors, lay leaders,
                   and their families.
                 </p>
-                <div class="d-flex flex-wrap gap-3 mt-4">
-                  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#famous">Famous Campers</button>
-                  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#moments1800s">1800s Moments</button>
-                  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#moments1900">1900+  Moments</button>
-                </div>
+                <p class="mb-0">
+                  More from the record:
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#famous">Famous Campers</button>,
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#moments1800s">1800s Moments</button>,
+                  and
+                  <button type="button" class="inline-reference" data-bs-toggle="modal" data-bs-target="#moments1900">1900+ Moments</button>.
+                </p>
               </div>
 
               <!-- Landmark Content -->
               <div class="tab-pane fade" id="landmark-tab-pane" role="tabpanel" aria-labelledby="landmark-tab" tabindex="1">
-                <h3 class="text-success fw-bold mb-4 text-center">United Methodist Church Heritage Landmark Designation</h3>
+                <p class="eyebrow">Designated 2002</p>
+                <h2 class="mb-4">United Methodist Church Heritage Landmark Designation</h2>
                 <p>
                   In the year 2002, a significant recognition was bestowed upon the Dimock Camp Meeting Ground. The United
                   Methodist Church's General Commission on Archives and History took a noteworthy step in acknowledging
                   its historical and cultural importance. Acting upon the recommendation of the Wyoming Annual Conference,
                   the Dimock Camp Meeting Ground was designated as a national heritage landmark.
                 </p>
-                <a href="https://gcah.org/resources/directories/register-of-united-methodist-historic-sites/" class="btn btn-outline-success mt-4" target="_blank" rel="noopener">UMC Historic Site Registry</a>
+                <a href="https://gcah.org/resources/directories/register-of-united-methodist-historic-sites/" class="btn-pine-outline mt-4" target="_blank" rel="noopener">UMC Historic Site Registry</a>
               </div>
             </div>
-          </div>
-        </div>
+      </div>
     </div>
 
     <!-- Wyalusing District Modal -->
@@ -196,7 +198,7 @@
               saddlebags.  He would preach any day and any where - indoor or outdoor.  It
               might take him more than a month to traverse his circuit!
             </p>
-            <a href="http://en.wikipedia.org/wiki/Circuit_rider_(religious)" target="_blank" rel="noopener" class="btn btn-outline-success">More Details</a>
+            <a href="http://en.wikipedia.org/wiki/Circuit_rider_(religious)" target="_blank" rel="noopener" class="btn-pine-outline">More Details</a>
           </div>
         </div>
       </div>

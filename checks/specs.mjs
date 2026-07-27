@@ -6,6 +6,7 @@ export const ALL = PAGES;
 const BOOTSTRAP_GREEN = "rgb(25, 135, 84)";
 const BOOTSTRAP_RED = "rgb(220, 53, 69)";
 const PINE = "rgb(44, 87, 65)";
+const PINE_DEEP = "rgb(31, 64, 48)";
 const OCHRE_INK = "rgb(138, 86, 24)";
 
 // Text sitting over a photograph has no computable background. The hero is the
@@ -218,20 +219,162 @@ export const specs = [
     },
   },
   {
-    id: "event-header-fills",
+    id: "no-filled-card-headers",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const filled = await page.evaluate(
+        (accents) =>
+          Array.from(document.querySelectorAll(".card-header"))
+            .map((header) => ({
+              text: header.textContent.trim().replace(/\s+/g, " ").slice(0, 40),
+              background: getComputedStyle(header).backgroundColor,
+            }))
+            .filter((entry) => accents.includes(entry.background)),
+        [PINE, OCHRE_INK, PINE_DEEP]
+      );
+      if (filled.length > 0) {
+        return `${filled.length} .card-header(s) still filled with an accent, first: "${filled[0].text}" on ${filled[0].background}`;
+      }
+      // The computed check only sees what survives in the DOM; the class names
+      // are what a future edit would copy, so they are banned in the source too.
+      const source = await page.evaluate(
+        async (name) => (await fetch(`${name}.html`)).text(),
+        ctx.name
+      );
+      const banned = ["bg-success", "bg-danger"].filter((name) => source.includes(name));
+      return banned.length === 0
+        ? null
+        : `the markup still uses ${banned.join(", ")}`;
+    },
+  },
+  {
+    id: "no-bg-gradient",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const source = await page.evaluate(
+        async (name) => (await fetch(`${name}.html`)).text(),
+        ctx.name
+      );
+      const count = (source.match(/bg-gradient/g) ?? []).length;
+      return count === 0 ? null : `bg-gradient appears ${count} time(s)`;
+    },
+  },
+  {
+    id: "no-btn-secondary",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const source = await page.evaluate(
+        async (name) => (await fetch(`${name}.html`)).text(),
+        ctx.name
+      );
+      const count = (source.match(/btn-secondary/g) ?? []).length;
+      return count === 0 ? null : `btn-secondary appears ${count} time(s)`;
+    },
+  },
+  {
+    id: "day-conveyed-in-text",
     pages: ["events"],
     check: async (page) => {
-      const headers = await page.evaluate(() =>
-        Array.from(document.querySelectorAll(".event-card .card-header")).map((header) => ({
-          day: (header.querySelector(".event-date")?.textContent ?? "").trim().slice(0, 3),
-          background: getComputedStyle(header).backgroundColor,
+      // Strip every colour from the page: if the day is only carried by a tint,
+      // this is where the information disappears.
+      const cards = await page.evaluate(() =>
+        Array.from(document.querySelectorAll(".event-card")).map((card) => ({
+          text: card.textContent.replace(/\s+/g, " ").trim(),
+          dayTinted: getComputedStyle(
+            card.querySelector(".event-day") ?? card
+          ).color,
         }))
       );
-      if (headers.length === 0) return "found no .event-card .card-header elements";
-      const wanted = { Sun: PINE, Sat: OCHRE_INK };
-      const wrong = headers.filter((header) => header.background !== wanted[header.day]);
-      if (wrong.length === 0) return null;
-      return `${wrong.length} header(s) mis-filled, first: ${wrong[0].day} is ${wrong[0].background}, expected ${wanted[wrong[0].day]}`;
+      if (cards.length === 0) return "found no .event-card elements";
+      const silent = cards.filter((card) => !/\b(Sat|Sun)\b/.test(card.text));
+      if (silent.length > 0) {
+        return `${silent.length} event card(s) name no day in text, first: "${silent[0].text.slice(0, 40)}"`;
+      }
+      const wanted = [PINE, OCHRE_INK];
+      const offPalette = cards.filter((card) => !wanted.includes(card.dayTinted));
+      return offPalette.length === 0
+        ? null
+        : `an .event-day is ${offPalette[0].dayTinted}, expected one of ${wanted.join(" / ")}`;
+    },
+  },
+  {
+    id: "visible-focus-ring",
+    pages: ALL,
+    check: async (page) => {
+      // Tabbing is what makes :focus-visible match — focus() alone does not.
+      const seen = [];
+      for (let step = 0; step < 12; step += 1) {
+        await page.keyboard.press("Tab");
+        const focused = await page.evaluate(() => {
+          const el = document.activeElement;
+          if (!el || el === document.body) return null;
+          const style = getComputedStyle(el);
+          const ring = parseFloat(style.outlineWidth) || 0;
+          // Tabbing to a cross-origin iframe hands focus to the frame's own
+          // document, so the element matches neither :focus nor :focus-within
+          // out here and no stylesheet of ours can reach it. The map is the
+          // only one on the site; its focus ring is the frame's to draw.
+          if (el.tagName === "IFRAME") return { skip: true };
+          return {
+            element: `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? `.${el.className.trim().split(/\s+/)[0]}` : ""}`,
+            text: (el.textContent || "").trim().slice(0, 30),
+            ring: style.outlineStyle === "none" ? 0 : ring,
+            shadow: style.boxShadow,
+          };
+        });
+        if (!focused) break;
+        if (!focused.skip) seen.push(focused);
+      }
+      // Tabbing scrolls the page, and Bootstrap turns on smooth scrolling, so
+      // put it back instantly rather than leaving a later spec to measure a
+      // page that is still gliding upward.
+      await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
+
+      if (seen.length === 0) return "nothing took keyboard focus in 12 tab presses";
+      const dim = seen.filter((entry) => entry.ring < 2);
+      return dim.length === 0
+        ? null
+        : `${dim.length} of ${seen.length} focused element(s) show an outline under 2px, first: ${dim[0].element} "${dim[0].text}" (outline ${dim[0].ring}px)`;
+    },
+  },
+  {
+    id: "respects-reduced-motion",
+    pages: ALL,
+    check: async (page) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      try {
+        const moving = await page.evaluate(() => {
+          const longest = (value) =>
+            Math.max(
+              0,
+              ...value.split(",").map((part) => {
+                const seconds = parseFloat(part);
+                if (Number.isNaN(seconds)) return 0;
+                return /ms\s*$/.test(part.trim()) ? seconds / 1000 : seconds;
+              })
+            );
+          return Array.from(document.querySelectorAll("body *"))
+            .map((el) => {
+              const style = getComputedStyle(el);
+              return {
+                element: `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? `.${el.className.trim().split(/\s+/)[0]}` : ""}`,
+                seconds: Math.max(
+                  longest(style.transitionDuration),
+                  longest(style.animationDuration)
+                ),
+              };
+            })
+            .filter((entry) => entry.seconds > 0.02);
+        });
+        return moving.length === 0
+          ? null
+          : `${moving.length} element(s) still animate under prefers-reduced-motion, first: ${moving[0].element} at ${moving[0].seconds}s`;
+      } finally {
+        await page.emulateMedia({ reducedMotion: null });
+      }
     },
   },
   {
@@ -530,7 +673,7 @@ export const specs = [
     pages: ALL,
     check: async (page) => {
       const measured = await page.evaluate(() => {
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: "instant" });
         const nav = document.querySelector(".site-nav");
         const heading = document.querySelector("h1");
         if (!nav) return { error: "no .site-nav element" };
