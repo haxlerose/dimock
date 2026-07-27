@@ -6,11 +6,46 @@ Static HTML site for a Methodist camp meeting ground in Dimock, PA (est. 1875).
 
 ## Design authority
 
-**Read `docs/design-direction.md` before making any visual change.** It carries the
-approved palette, typography, component system, accessibility standards, and the
-phasing plan for the redesign now in progress. This file describes the code as it
-stands today; that file describes where it is going. Where they disagree about
-intent, the design direction wins.
+**Read `docs/design-direction.md` before making any visual change**, and
+`docs/redesign-plan.md` before doing any of the work. The first carries the approved
+palette, typography, component system, and accessibility standards; the second is the
+phased implementation plan with checkboxes tracking what has shipped. This file
+describes the code as it stands today; those describe where it is going. Where they
+disagree about intent, the design direction wins.
+
+`docs/` is gitignored — those documents are local to this working copy and are not in
+the repository. If they are missing, the redesign has to be replanned before it can
+continue; do not guess at the direction from the code alone.
+
+## Verifying changes
+
+```bash
+checks/run.sh            # all specs, desktop + mobile; non-zero exit on any failure
+checks/run.sh --shots    # same, plus screenshots into docs/screens/ for review
+```
+
+`checks/` is a Playwright harness that serves the site on port 8811 and asserts, for
+every page at 1440×900 and 390×844: no console errors, exactly one `<h1>`, and zero
+horizontal overflow — plus whatever the current redesign phase has added (contrast
+ratios, nav and footer identity across pages, per-page metadata). Run it before every
+commit that touches HTML or CSS. A passing run is necessary but not sufficient —
+`--shots` exists to be looked at.
+
+**`checks/` is never deployed.** `.claude/commands/deploy.md` excludes it alongside
+`backup/`.
+
+Three environment facts, because each costs a turn to rediscover: Playwright is not
+installed locally, so resolve it with
+`eval "$(node ~/.claude/skills/playwright-gotchas/scripts/resolve-playwright.mjs)"`;
+the module is CommonJS, so use `createRequire` rather than `import { chromium }`; and
+`launch()` must be passed `executablePath: process.env.PW_EXECUTABLE` because the
+installed browser revision differs from the module's pinned one.
+
+> **Not built yet.** The harness arrives in Phase 0 of `docs/redesign-plan.md`, which
+> contains all four files in full. Until then, verify by hand: run
+> `python3 -m http.server 8811`, then check every page you changed at 1440 and 390 for
+> horizontal overflow, console errors, working tabs and modals, and a functioning
+> mobile nav.
 
 ## Stack
 
