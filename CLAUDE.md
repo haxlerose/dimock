@@ -53,8 +53,7 @@ gitignored.
 - **Fraunces + Inter** via Google Fonts, with two `preconnect` links. All three
   `<link>` tags sit between the Bootstrap stylesheet and `site.css`, identically on
   all six pages
-- **`site.css`** — shared stylesheet, linked by all pages except the homepage on
-  this branch (see below)
+- **`site.css`** — the shared stylesheet, linked by all six pages
 - No JS framework — Bootstrap bundle JS only
 - **No build step.** No bundler, no Sass, no package manager, no CMS. Every
   deployed file exists in the repo, and pages stay hand-editable by a non-developer.
@@ -65,8 +64,8 @@ gitignored.
 
 | File | Scope |
 |------|-------|
-| `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, current nav/hero/card/tab styling. |
-| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. The approved new design system: pine/ochre/cream tokens, Fraunces + Inter, `.eyebrow` / `.statement` / `.figure-tile` / `.pullquote` / `.milestones` / `.site-nav` / `.site-footer`. |
+| `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, `.site-nav` / `.site-footer` / `.container-narrow`, current hero/card/tab styling. |
+| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. Still holds the components `site.css` has not adopted yet: `.eyebrow` / `.statement` / `.figure-tile` / `.pullquote` / `.milestones` (Phase 4). |
 
 `prototype.css` is scaffolding, not a second live stylesheet: only
 `index-prototype.html` links it, and nothing links to that page. The new system lands
@@ -119,42 +118,31 @@ block, and an inline-SVG favicon. Order in the `<head>` matters: Bootstrap first
 the three font links second, `site.css` last, so site rules win. Full canonical block
 in `docs/redesign-plan.md` Appendix B.
 
-## Nav pattern
+## The shared shell — nav, footer, year script
 
-Identical on every page except the prototype homepage. Copy from any existing
-page. Active page link gets `class="nav-link px-4 active"`. Colors, hover states,
-and the green toggler icon all come from `site.css` — pages no longer carry an
-inline `<style>` block for it.
+Landed in `site.css` and all six pages (Phase 3). Three blocks — a sticky
+`.site-nav`, a `.site-footer`, and the year script — are **identical on all six
+pages, byte for byte**, with one exception: the current page's nav link carries
+`class="nav-link active"` **and** `aria-current="page"`, because the ochre
+underline is a color cue and must not be the only signal. On `index.html` there
+is no Home link, so the brand carries `aria-current="page"` instead.
 
-```html
-<nav class="navbar navbar-expand-lg bg-white py-3">
-  <div class="container-fluid">
-    <a class="navbar-brand ps-0 ps-md-4 text-success fw-bold me-2" href="/">Dimock Camp Meeting Ground</a>
-    <button class="navbar-toggler border border-2 border-success px-2" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-lg-center ps-2" id="navbarNavAltMarkup">
-      <div class="navbar-nav fw-bold">
-        <a class="nav-link px-4" href="about.html">About</a>
-        <a class="nav-link px-4" href="services.html">Services</a>
-        <a class="nav-link px-4" href="events.html">Events</a>
-        <a class="nav-link px-4" href="visit.html">Visit Us</a>
-        <a class="nav-link px-4" href="contact.html">Contact</a>
-      </div>
-    </div>
-  </div>
-</nav>
-```
+The canonical markup is `docs/redesign-plan.md` Appendix A — copy from there or
+from any existing page. The nav collapses to `#site-nav-links` (renamed from
+Bootstrap's example `navbarNavAltMarkup`); the footer sits immediately before the
+Bootstrap script tag; the year script sits immediately after it and fills both
+`.footer-year` on every page and `#current-year` on the homepage, guarding for
+the latter's absence. Both years are also **hardcoded in the markup** so a
+visitor without JavaScript never sees a bare `©`.
 
-The prototype homepage uses a different, sticky `.site-nav` with a brand subtitle
-and an ochre active underline. It is the intended replacement, but until it lands
-everywhere the two must not be mixed.
+**A change to any of the three is a change to all six files.** That is the
+accepted tradeoff for a no-build static site: it works without JS and never
+flashes unstyled. `checks/run.sh` enforces it — `nav-identical-across-pages` and
+`footer-identical-across-pages` normalize away whitespace and the active markers
+and fail on any other difference.
 
-**The nav and footer are duplicated by hand across pages — a change to one is a
-change to all six, byte-identical.** That is the accepted tradeoff for a no-build
-static site: it works without JS and never flashes unstyled.
+Colors, the sticky behavior, the translucent background, and the toggler icon all
+come from `site.css`. Pages carry no inline `<style>` block.
 
 ## Hero pattern (index, contact)
 

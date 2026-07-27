@@ -21,19 +21,24 @@
     <link href="site.css" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg bg-white py-3">
-      <div class="container-fluid">
-        <a class="navbar-brand ps-0 ps-md-4 text-success fw-bold me-2" href="/">Dimock Camp Meeting Ground</a>
-        <button class="navbar-toggler border border-2 border-success px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="site-nav navbar navbar-expand-lg">
+      <div class="container container-narrow">
+        <a class="navbar-brand me-3" href="/">
+          Dimock Camp Meeting Ground
+          <small>Est. 1875 &middot; Dimock, Pennsylvania</small>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#site-nav-links" aria-controls="site-nav-links"
+                aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-lg-center ps-2" id="navbarNavAltMarkup">
-          <div class="navbar-nav fw-bold">
-            <a class="nav-link px-4 active" href="about.html">About</a>
-            <a class="nav-link px-4" href="services.html">Services</a>
-            <a class="nav-link px-4" href="events.html">Events</a>
-            <a class="nav-link px-4" href="visit.html">Visit Us</a>
-            <a class="nav-link px-4" href="contact.html">Contact</a>
+        <div class="collapse navbar-collapse justify-content-lg-end" id="site-nav-links">
+          <div class="navbar-nav">
+            <a class="nav-link active" aria-current="page" href="about.html">About</a>
+            <a class="nav-link" href="services.html">Services</a>
+            <a class="nav-link" href="events.html">Events</a>
+            <a class="nav-link" href="visit.html">Visit Us</a>
+            <a class="nav-link" href="contact.html">Contact</a>
           </div>
         </div>
       </div>
@@ -544,6 +549,60 @@
       </div>
     </div>
 
+    <footer class="site-footer">
+      <div class="container container-narrow">
+        <div class="row g-4 g-lg-5">
+          <div class="col-12 col-lg-5">
+            <p class="site-footer__brand">Dimock Camp Meeting Ground</p>
+            <p class="mb-0">
+              Serving Christ in the Endless Mountains since 1875. A United Methodist Church
+              heritage landmark.
+            </p>
+          </div>
+          <div class="col-6 col-lg-3">
+            <p class="site-footer__heading">Visit</p>
+            <ul>
+              <li>46 Dimock Camp Road</li>
+              <li>Springville, PA 18844</li>
+              <li class="pt-2"><a href="visit.html">Directions &amp; attractions</a></li>
+            </ul>
+          </div>
+          <div class="col-6 col-lg-2">
+            <p class="site-footer__heading">Services</p>
+            <ul>
+              <li>Sundays at 6:00 pm</li>
+              <li>July &ndash; September</li>
+              <li class="pt-2"><a href="events.html">This season</a></li>
+            </ul>
+          </div>
+          <div class="col-12 col-lg-2">
+            <p class="site-footer__heading">More</p>
+            <ul>
+              <li><a href="about.html">About</a></li>
+              <li><a href="services.html">Services</a></li>
+              <li><a href="contact.html">Contact</a></li>
+              <li><a href="mailto:DimockCampMeeting@gmail.com">Email us</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="site-footer__legal">
+          &copy; <span class="footer-year">2026</span> Dimock Camp Meeting Ground &middot;
+          <a href="mailto:DimockCampMeeting@gmail.com">DimockCampMeeting@gmail.com</a>
+        </div>
+      </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script>
+      (function () {
+        var year = new Date().getFullYear();
+        var heritageYear = document.getElementById('current-year');
+        if (heritageYear) { heritageYear.textContent = year; }
+        Array.prototype.forEach.call(
+          document.querySelectorAll('.footer-year'),
+          function (el) { el.textContent = year; }
+        );
+      })();
+    </script>
   </body>
 </html>

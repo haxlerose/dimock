@@ -114,6 +114,53 @@ const collectPalette = () => {
   return found;
 };
 
+/**
+ * The nav and the footer are hand-duplicated across six files, so the only
+ * thing keeping them identical is a check. Normalizing throws away whitespace
+ * and the two attributes that are *meant* to differ — the active class and
+ * aria-current — leaving everything else as a difference worth failing on.
+ */
+const normalizeShell = (markup) =>
+  markup
+    .replace(/\s+aria-current="page"/g, "")
+    .replace(/class="([^"]*)"/g, (whole, value) => {
+      const kept = value.trim().split(/\s+/).filter((name) => name !== "active");
+      return `class="${kept.join(" ")}"`;
+    })
+    .replace(/>\s+</g, "><")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const fetchPageSources = (page) =>
+  page.evaluate(async (pages) => {
+    const found = {};
+    for (const name of pages) {
+      found[name] = await (await fetch(`${name}.html`)).text();
+    }
+    return found;
+  }, PAGES);
+
+const shellIdentity = (tag, label) => async (page, ctx) => {
+  const sources = await fetchPageSources(page);
+  const pattern = new RegExp(`<${tag}[\\s\\S]*?</${tag}>`, "i");
+
+  const blocks = {};
+  for (const name of PAGES) {
+    const match = sources[name].match(pattern);
+    if (!match) return `${name}.html has no <${tag}> element`;
+    blocks[name] = normalizeShell(match[0]);
+  }
+
+  const mine = blocks[ctx.name];
+  const different = PAGES.filter((name) => name !== ctx.name && blocks[name] !== mine);
+  if (different.length === 0) return null;
+
+  const other = blocks[different[0]];
+  let at = 0;
+  while (at < mine.length && mine[at] === other[at]) at += 1;
+  return `${label} differs from ${different.join(", ")}; first divergence at character ${at} — this page has "${mine.slice(at, at + 50)}", ${different[0]}.html has "${other.slice(at, at + 50)}"`;
+};
+
 const bannedColor = (banned, label) => async (page) => {
   const found = await page.evaluate(collectPalette);
   const hits = found.filter((entry) => entry.value.startsWith(banned.slice(0, -1)));
@@ -362,6 +409,141 @@ export const specs = [
       );
       if (wide.length === 0) return null;
       return `${wide.length} prose paragraph(s) wider than 780px, first: "${wide[0].text}" at ${wide[0].width}px`;
+    },
+  },
+  {
+    id: "nav-identical-across-pages",
+    pages: ALL,
+    check: shellIdentity("nav", "the nav"),
+  },
+  {
+    id: "footer-identical-across-pages",
+    pages: ALL,
+    check: shellIdentity("footer", "the footer"),
+  },
+  {
+    id: "aria-current-on-active-link",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const marked = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('.site-nav a[aria-current="page"]')).map(
+          (el) => new URL(el.getAttribute("href"), location.href).pathname
+        )
+      );
+      if (marked.length !== 1) {
+        return `${marked.length} nav link(s) carry aria-current="page", expected exactly 1`;
+      }
+      // "/" is the home link on the brand, and resolves to index.html.
+      const slug =
+        marked[0].replace(/\/$/, "").split("/").pop().replace(/\.html$/, "") || "index";
+      return slug === ctx.name
+        ? null
+        : `aria-current="page" points at "${slug}", not "${ctx.name}"`;
+    },
+  },
+  {
+    id: "footer-present",
+    pages: ALL,
+    check: async (page) => {
+      const footer = await page.evaluate(() => {
+        const el = document.querySelector("footer");
+        if (!el) return null;
+        return {
+          text: el.textContent.replace(/\s+/g, " "),
+          mailto: el.querySelectorAll('a[href^="mailto:"]').length,
+        };
+      });
+      if (!footer) return "no <footer> element";
+      const missing = ["46 Dimock Camp Road", "6:00 pm"].filter(
+        (needle) => !footer.text.includes(needle)
+      );
+      if (footer.mailto === 0) missing.push("a mailto: link");
+      return missing.length === 0 ? null : `the footer is missing ${missing.join(", ")}`;
+    },
+  },
+  {
+    id: "footer-year-current",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const rendered = await page.evaluate(() => {
+        const el = document.querySelector(".footer-year");
+        return el ? el.textContent.trim() : null;
+      });
+      if (rendered === null) return "no .footer-year element in the footer";
+
+      const year = String(new Date().getFullYear());
+      if (rendered !== year) return `.footer-year renders "${rendered}", expected "${year}"`;
+
+      // Without JavaScript the span is never filled, so the served markup has
+      // to carry a year of its own or the footer reads as a bare ©.
+      const source = await page.evaluate(
+        async (name) => (await fetch(`${name}.html`)).text(),
+        ctx.name
+      );
+      const fallback = source.match(/<span class="footer-year">([^<]*)<\/span>/);
+      if (!fallback) return "no hardcoded .footer-year fallback in the served markup";
+      return /^\d{4}$/.test(fallback[1].trim())
+        ? null
+        : `the .footer-year fallback is "${fallback[1]}", expected a four-digit year`;
+    },
+  },
+  {
+    id: "mobile-nav-toggles",
+    pages: ALL,
+    check: async (page, ctx) => {
+      if (ctx.viewport.name !== "mobile") return null;
+
+      const menu = page.locator("#site-nav-links");
+      const toggler = page.locator(".site-nav .navbar-toggler");
+      if ((await toggler.count()) === 0) return "no .navbar-toggler in the nav";
+      if ((await menu.count()) === 0) return "no #site-nav-links collapse target";
+
+      if (await menu.isVisible()) return "the menu is already open before the toggler is used";
+
+      // Bootstrap ignores a toggle while one is still animating, so each click
+      // waits for the collapse to settle rather than for the first frame in
+      // which the menu happens to have a box.
+      const settled = (open) =>
+        page
+          .locator(`#site-nav-links${open ? ".show" : ":not(.show)"}:not(.collapsing)`)
+          .waitFor({ state: "attached", timeout: 3000 });
+
+      await toggler.click();
+      try {
+        await settled(true);
+      } catch {
+        return "clicking the toggler did not open the menu";
+      }
+      if (!(await menu.isVisible())) return "the menu opened but is not visible";
+
+      await toggler.click();
+      try {
+        await settled(false);
+      } catch {
+        return "clicking the toggler again did not close the menu";
+      }
+      return (await menu.isVisible()) ? "the menu closed but is still visible" : null;
+    },
+  },
+  {
+    id: "sticky-nav-clears-content",
+    pages: ALL,
+    check: async (page) => {
+      const measured = await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        const nav = document.querySelector(".site-nav");
+        const heading = document.querySelector("h1");
+        if (!nav) return { error: "no .site-nav element" };
+        if (!heading) return { error: "no <h1> element" };
+        return {
+          navBottom: nav.getBoundingClientRect().bottom,
+          headingTop: heading.getBoundingClientRect().top,
+        };
+      });
+      if (measured.error) return measured.error;
+      return measured.headingTop >= measured.navBottom - 1
+        ? null
+        : `the <h1> starts at ${Math.round(measured.headingTop)}px, beneath a nav ending at ${Math.round(measured.navBottom)}px`;
     },
   },
 ];

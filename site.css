@@ -18,6 +18,11 @@
   --muted:      #6a6f64;  /* captions, secondary text */
   --rule:       #ded8ca;  /* hairlines and borders */
 
+  /* Channels, for the few places that need a palette colour at partial alpha —
+     the translucent nav and the footer's tints. There is no build step to do
+     the arithmetic, so the channels are written out once here. */
+  --paper-rgb:  255, 253, 248;
+
   --shadow-soft: 0 0.75rem 1.75rem rgba(35, 38, 31, 0.07);
   --measure:     66ch;
 
@@ -102,28 +107,137 @@ img {
   height: auto;
 }
 
-.navbar {
+/* ---------------------------------------------------------------------------
+   The shared shell — one sticky nav and one footer, identical on all six pages.
+   The markup is hand-duplicated because there is no build step, so a change to
+   either here is a change to six HTML files. The canonical blocks live in
+   docs/redesign-plan.md Appendix A, and checks/specs.mjs fails the build if the
+   six copies drift apart.
+   --------------------------------------------------------------------------- */
+.container-narrow {
+  max-width: 1180px;
+}
+
+.site-nav {
+  backdrop-filter: saturate(1.4) blur(8px);
+  background: rgba(var(--paper-rgb), 0.94);
   border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
 
-.navbar .nav-link {
+.site-nav .navbar-brand {
+  color: var(--pine);
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.site-nav .navbar-brand small {
+  color: var(--ochre-ink);
+  display: block;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.site-nav .nav-link {
   color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-inline: 1.1rem;
+  position: relative;
 }
 
-.navbar .nav-link:hover,
-.navbar .nav-link:focus,
-.navbar .nav-link.active {
+.site-nav .nav-link:hover,
+.site-nav .nav-link:focus,
+.site-nav .nav-link.active {
   color: var(--pine-deep);
 }
 
-.navbar-toggler-icon {
+/* The underline marks the current page; aria-current="page" in the markup says
+   the same thing to anyone who cannot see the colour. */
+.site-nav .nav-link.active::after {
+  background: var(--ochre);
+  bottom: 0.15rem;
+  content: "";
+  height: 2px;
+  left: 1.1rem;
+  position: absolute;
+  right: 1.1rem;
+}
+
+.site-nav .navbar-toggler {
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.6rem;
+}
+
+.site-nav .navbar-toggler-icon {
   background-image: url(
-    "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(44, 87, 65, 0.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"
+    "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(44, 87, 65, 0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 9h24M4 16h24M4 23h24'/%3E%3C/svg%3E"
   );
 }
 
-.navbar-brand {
-  white-space: normal;
+.site-footer {
+  background: var(--pine-deep);
+  color: rgba(var(--paper-rgb), 0.75);
+  font-size: 0.95rem;
+  padding-block: clamp(3rem, 6vw, 4.5rem) 2rem;
+}
+
+.site-footer a {
+  color: rgba(var(--paper-rgb), 0.88);
+  text-decoration: none;
+}
+
+.site-footer a:hover,
+.site-footer a:focus {
+  color: var(--paper);
+  text-decoration: underline;
+}
+
+.site-footer__brand {
+  color: var(--paper);
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.site-footer__heading {
+  color: var(--ochre-lift);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.9rem;
+  text-transform: uppercase;
+}
+
+.site-footer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer li + li {
+  margin-top: 0.45rem;
+}
+
+.site-footer__legal {
+  border-top: 1px solid rgba(var(--paper-rgb), 0.16);
+  color: rgba(var(--paper-rgb), 0.6);
+  font-size: 0.85rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
 }
 
 .page-title {
@@ -356,9 +470,28 @@ img {
   background: var(--ink);
 }
 
+/* Collapsed nav: the links stack, so the inline padding that spaces them
+   horizontally would only indent them, and the active underline sits under the
+   word rather than spanning the row. */
+@media (max-width: 991.98px) {
+  .site-nav .navbar-nav {
+    padding-block: 0.75rem;
+  }
+
+  .site-nav .nav-link {
+    padding-inline: 0;
+  }
+
+  .site-nav .nav-link.active::after {
+    left: 0;
+    right: auto;
+    width: 2rem;
+  }
+}
+
 @media (max-width: 575.98px) {
-  .navbar {
-    --bs-navbar-brand-font-size: 1.05rem;
+  .site-nav .navbar-brand {
+    font-size: 1.05rem;
   }
 
   .hero {
