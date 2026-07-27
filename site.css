@@ -36,18 +36,57 @@
   --bs-emphasis-color: var(--ink);
 }
 
+/* ---------------------------------------------------------------------------
+   Typography. Inter for everything that is read, Fraunces for everything that
+   is looked at. 17px/1.7 is a floor for an older audience — never reduce it for
+   visual balance. See docs/design-direction.md §6.
+   --------------------------------------------------------------------------- */
 body {
   background: var(--cream);
   color: var(--ink);
-  line-height: 1.65;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.7;
 }
 
 h1,
 h2,
 h3,
 h4,
+h5,
+h6,
 .navbar-brand {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+}
+
+h3 {
+  font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+}
+
+h4 {
+  font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+}
+
+.lede {
+  font-size: clamp(1.125rem, 1.6vw, 1.3rem);
+  line-height: 1.55;
+}
+
+/* Caps line length for sustained reading. */
+.measure {
+  max-width: var(--measure);
 }
 
 a {
@@ -111,6 +150,15 @@ img {
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
 }
 
+.hero-title {
+  font-size: clamp(2.4rem, 6.4vw, 4.4rem);
+}
+
+/* The subtitle wraps at 390px, where the 1.12 heading leading is too tight. */
+.hero-subtitle {
+  line-height: 1.3;
+}
+
 .dimock-card {
   background: var(--paper);
   border: 1px solid var(--rule);
@@ -156,13 +204,22 @@ img {
   }
 }
 
-.tab-pane > p,
-.tab-pane > ul,
-.tab-pane > h5,
-.tab-pane > h2 {
+/* One reading column for the whole pane, not one per child: `ch` resolves
+   against each element's own font-size, so per-child caps left the headings
+   hanging outside the paragraphs' left edge. */
+.tab-pane {
   margin-left: auto;
   margin-right: auto;
-  max-width: 74ch;
+  max-width: var(--measure);
+}
+
+/* A sub-heading belongs to what follows it, not to what precedes it. */
+.tab-pane > h5 {
+  margin-top: 2.25rem;
+}
+
+.tab-pane > h5:first-of-type {
+  margin-top: 0;
 }
 
 .nav-underline .nav-link {
@@ -238,6 +295,11 @@ img {
   border: 1px solid var(--rule);
   border-left: 0.35rem solid var(--ochre);
   color: var(--ink);
+}
+
+.notice > p,
+.notice > div {
+  max-width: var(--measure);
 }
 
 .event-card {

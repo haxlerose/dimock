@@ -222,4 +222,146 @@ export const specs = [
         : null;
     },
   },
+  {
+    id: "body-type-scale",
+    pages: ALL,
+    check: async (page) => {
+      const body = await page.evaluate(() => {
+        const style = getComputedStyle(document.body);
+        return {
+          family: style.fontFamily,
+          size: parseFloat(style.fontSize),
+          height: parseFloat(style.lineHeight) / parseFloat(style.fontSize),
+        };
+      });
+      const problems = [];
+      if (!/^["']?Inter\b/.test(body.family)) {
+        problems.push(`font-family is ${body.family}, expected Inter first`);
+      }
+      if (body.size < 17) problems.push(`font-size is ${body.size}px, needs >= 17px`);
+      if (body.height < 1.7) {
+        problems.push(`line-height is ${body.height.toFixed(2)}, needs >= 1.7`);
+      }
+      return problems.length === 0 ? null : problems.join("; ");
+    },
+  },
+  {
+    id: "headings-are-fraunces",
+    pages: ALL,
+    check: async (page) => {
+      const wrong = await page.evaluate(() =>
+        Array.from(document.querySelectorAll("h1, h2, h3"))
+          .map((el) => ({
+            tag: el.tagName.toLowerCase(),
+            text: el.textContent.trim().slice(0, 30),
+            family: getComputedStyle(el).fontFamily,
+          }))
+          .filter((entry) => !/^["']?Fraunces\b/.test(entry.family))
+      );
+      if (wrong.length === 0) return null;
+      return `${wrong.length} heading(s) are not Fraunces, first: <${wrong[0].tag}> "${wrong[0].text}" is ${wrong[0].family}`;
+    },
+  },
+  {
+    id: "unique-titles",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const titles = await page.evaluate(async (pages) => {
+        const found = {};
+        for (const name of pages) {
+          const response = await fetch(`${name}.html`);
+          const text = await response.text();
+          const match = text.match(/<title>([\s\S]*?)<\/title>/i);
+          found[name] = match ? match[1].trim() : "";
+        }
+        return found;
+      }, PAGES);
+      const mine = titles[ctx.name];
+      if (!mine) return "no non-empty <title>";
+      const clashes = PAGES.filter((name) => name !== ctx.name && titles[name] === mine);
+      return clashes.length === 0
+        ? null
+        : `<title> "${mine}" is shared with ${clashes.join(", ")}`;
+    },
+  },
+  {
+    id: "meta-description-present",
+    pages: ALL,
+    check: async (page) => {
+      const content = await page.evaluate(
+        () => document.querySelector('meta[name="description"]')?.content ?? null
+      );
+      if (content === null) return "no <meta name=\"description\">";
+      return content.trim().length >= 50
+        ? null
+        : `meta description is ${content.trim().length} characters, needs >= 50`;
+    },
+  },
+  {
+    id: "open-graph-present",
+    pages: ALL,
+    check: async (page) => {
+      const missing = await page.evaluate(() =>
+        ["og:title", "og:description", "og:image"].filter((property) => {
+          const tag = document.querySelector(`meta[property="${property}"]`);
+          return !tag || !tag.content.trim();
+        })
+      );
+      return missing.length === 0 ? null : `missing or empty: ${missing.join(", ")}`;
+    },
+  },
+  {
+    id: "favicon-present",
+    pages: ALL,
+    check: async (page) => {
+      const href = await page.evaluate(
+        () => document.querySelector('link[rel~="icon"]')?.getAttribute("href") ?? null
+      );
+      return href ? null : "no <link rel=\"icon\">";
+    },
+  },
+  {
+    id: "prose-not-centered",
+    pages: ["index", "services"],
+    check: async (page, ctx) => {
+      const centered = (selector) =>
+        page.evaluate((sel) => {
+          const nodes = Array.from(document.querySelectorAll(sel));
+          if (nodes.length === 0) return null;
+          return nodes.every((el) => getComputedStyle(el).textAlign === "center");
+        }, selector);
+
+      if (ctx.name === "index") {
+        const heritage = await centered(".heritage-band p");
+        if (heritage === null) return "found no paragraphs in .heritage-band";
+        return heritage ? "the heritage paragraph is still centred" : null;
+      }
+
+      const prayer = await centered("#prayer-tab-pane p");
+      const rekindling = await centered("#rekindling-tab-pane p");
+      if (prayer === null) return "found no paragraphs in #prayer-tab-pane";
+      if (rekindling === null) return "found no paragraphs in #rekindling-tab-pane";
+      if (!prayer) return "the prayer should stay centred, and is not";
+      return rekindling ? "the Rekindling list is still centred" : null;
+    },
+  },
+  {
+    id: "measure-capped",
+    pages: ALL,
+    check: async (page, ctx) => {
+      if (ctx.viewport.name !== "desktop") return null;
+      const wide = await page.evaluate(() =>
+        Array.from(document.querySelectorAll("p"))
+          .filter((el) => el.textContent.trim().length > 200)
+          .filter((el) => el.getClientRects().length > 0)
+          .map((el) => ({
+            text: el.textContent.trim().slice(0, 40),
+            width: Math.round(el.getBoundingClientRect().width),
+          }))
+          .filter((entry) => entry.width > 780)
+      );
+      if (wide.length === 0) return null;
+      return `${wide.length} prose paragraph(s) wider than 780px, first: "${wide[0].text}" at ${wide[0].width}px`;
+    },
+  },
 ];

@@ -50,6 +50,9 @@ gitignored.
 ## Stack
 
 - **Bootstrap 5.3.1** via CDN, with SRI `integrity` hashes — keep them
+- **Fraunces + Inter** via Google Fonts, with two `preconnect` links. All three
+  `<link>` tags sit between the Bootstrap stylesheet and `site.css`, identically on
+  all six pages
 - **`site.css`** — shared stylesheet, linked by all pages except the homepage on
   this branch (see below)
 - No JS framework — Bootstrap bundle JS only
@@ -62,7 +65,7 @@ gitignored.
 
 | File | Scope |
 |------|-------|
-| `site.css` | The live shared stylesheet, linked by all six pages. Bootstrap-green tokens, current nav/hero/card/tab styling. |
+| `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, current nav/hero/card/tab styling. |
 | `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. The approved new design system: pine/ochre/cream tokens, Fraunces + Inter, `.eyebrow` / `.statement` / `.figure-tile` / `.pullquote` / `.milestones` / `.site-nav` / `.site-footer`. |
 
 `prototype.css` is scaffolding, not a second live stylesheet: only
@@ -88,15 +91,33 @@ viewer, not linked from the nav.
 
 ## Color scheme
 
-**Current (`site.css`):** primary accent is Bootstrap `success` green, exposed as
-`--dimock-green` / `--dimock-green-dark`. Saturday events use `--dimock-red`,
-Sunday events green.
+Landed in `site.css` (Phase 1). `--pine` `#2c5741` is the primary accent with
+`--ochre` `#b4762a` as the second, on `--cream` / `--paper`. Bootstrap adopts the
+palette through a `--bs-*` remapping in the same `:root` block, so `.text-success`
+and friends recolor without touching any HTML class. Red is retired, and color must
+never be the only carrier of meaning — Sunday events are pine, Saturday ochre, and
+both spell the day out in text. See design direction §5 for the full token list and
+the contrast-safe pairings — use the custom properties, never raw hex.
 
-**Target (`prototype.css`):** `--pine` `#2c5741` as the primary accent with
-`--ochre` `#b4762a` as the second, on `--cream` / `--paper`. Red is retired, and
-color must never be the only carrier of meaning. See design direction §5 for the
-full token list and the contrast-safe pairings — use the custom properties, never
-raw hex.
+`--bs-danger-rgb` is temporarily mapped to ochre so the Saturday event headers are
+not red; Phase 4 removes `bg-danger` from those cards and restores it to a real red.
+
+## Typography
+
+Landed in `site.css` (Phase 2). Fraunces for `h1`–`h4` and `.navbar-brand`, Inter for
+everything else. Body is `1.0625rem` / `1.7` — **a floor, not a target; never reduce
+it for visual balance.** Headings are weight 600 at `line-height: 1.12` with fluid
+`clamp()` sizes. `--measure` (66ch) caps line length for sustained reading, applied
+via the `.measure` class and the `.tab-pane > *` and `.notice > *` rules. Long-form
+prose is left-aligned everywhere; the prayer on `services.html` is the one
+deliberate exception.
+
+## Page head
+
+Every page carries a unique `<title>`, a `<meta name="description">`, an Open Graph
+block, and an inline-SVG favicon. Order in the `<head>` matters: Bootstrap first,
+the three font links second, `site.css` last, so site rules win. Full canonical block
+in `docs/redesign-plan.md` Appendix B.
 
 ## Nav pattern
 
