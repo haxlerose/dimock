@@ -1,17 +1,44 @@
+/* ---------------------------------------------------------------------------
+   Design tokens. Use the custom properties below this block — never a raw hex.
+   Contrast pairings are documented in docs/design-direction.md §5.
+   --------------------------------------------------------------------------- */
 :root {
-  --dimock-green: #198754;
-  --dimock-green-dark: #146c43;
-  --dimock-cream: #f7f4ed;
-  --dimock-paper: #fffdf8;
-  --dimock-ink: #242822;
-  --dimock-muted: #6c7068;
-  --dimock-border: #ded8ca;
-  --dimock-red: #b02a37;
+  /* Palette */
+  --pine:       #2c5741;  /* primary accent */
+  --pine-deep:  #1f4030;  /* dark bands, footer, hover states */
+  --pine-light: #4a7a60;  /* decorative only */
+
+  --ochre:      #b4762a;  /* rules, borders, decoration on light backgrounds */
+  --ochre-ink:  #8a5618;  /* ochre TEXT on light backgrounds */
+  --ochre-lift: #e3b878;  /* small ochre labels on dark pine only */
+
+  --cream:      #f7f4ed;  /* page background */
+  --paper:      #fffdf8;  /* alternating sections, raised surfaces */
+  --ink:        #23261f;  /* body text */
+  --muted:      #6a6f64;  /* captions, secondary text */
+  --rule:       #ded8ca;  /* hairlines and borders */
+
+  --shadow-soft: 0 0.75rem 1.75rem rgba(35, 38, 31, 0.07);
+  --measure:     66ch;
+
+  /* Bootstrap adopts the palette. site.css loads after Bootstrap, so redefining
+     these recolours .text-success, .bg-success, .border-success, .text-danger,
+     .bg-danger and links across all six pages without touching any HTML class.
+     --bs-danger-rgb is mapped to ochre only until Phase 4 removes bg-danger
+     from the Saturday event cards; it then returns to a real red. */
+  --bs-body-bg: var(--cream);
+  --bs-body-color: var(--ink);
+  --bs-border-color: var(--rule);
+  --bs-success-rgb: 44, 87, 65;      /* --pine */
+  --bs-danger-rgb: 138, 86, 24;      /* --ochre-ink */
+  --bs-link-color-rgb: 31, 64, 48;   /* --pine-deep */
+  --bs-link-hover-color-rgb: 44, 87, 65;
+  --bs-emphasis-color: var(--ink);
 }
 
 body {
-  background: var(--dimock-cream);
-  color: var(--dimock-ink);
+  background: var(--cream);
+  color: var(--ink);
   line-height: 1.65;
 }
 
@@ -24,30 +51,35 @@ h4,
 }
 
 a {
-  color: var(--dimock-green-dark);
+  color: var(--pine-deep);
 }
 
 a:hover {
-  color: var(--dimock-green);
+  color: var(--pine);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 .navbar {
-  border-bottom: 1px solid var(--dimock-border);
+  border-bottom: 1px solid var(--rule);
 }
 
 .navbar .nav-link {
-  color: var(--dimock-ink);
+  color: var(--ink);
 }
 
 .navbar .nav-link:hover,
 .navbar .nav-link:focus,
 .navbar .nav-link.active {
-  color: var(--dimock-green-dark);
+  color: var(--pine-deep);
 }
 
 .navbar-toggler-icon {
   background-image: url(
-    "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(25, 135, 84, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"
+    "data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(44, 87, 65, 0.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E"
   );
 }
 
@@ -56,7 +88,7 @@ a:hover {
 }
 
 .page-title {
-  color: var(--dimock-green-dark);
+  color: var(--pine-deep);
   margin-top: 3rem;
   margin-bottom: 1.75rem;
   margin-left: auto;
@@ -80,31 +112,31 @@ a:hover {
 }
 
 .dimock-card {
-  background: var(--dimock-paper);
-  border: 1px solid var(--dimock-border);
-  box-shadow: 0 0.75rem 1.75rem rgba(36, 40, 34, 0.08);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-soft);
 }
 
 .dimock-card .card-header {
-  background: var(--dimock-green-dark);
+  background: var(--pine-deep);
 }
 
 .dimock-card .card-body,
 .content-card .card-body,
 .event-card .card-body {
-  background: var(--dimock-paper);
+  background: var(--paper);
 }
 
 .heritage-band {
-  background: #e9f1e8;
-  border-top: 1px solid var(--dimock-border);
-  border-bottom: 1px solid var(--dimock-border);
+  background: var(--paper);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 
 .content-card {
-  background: var(--dimock-paper);
-  border: 1px solid var(--dimock-border);
-  box-shadow: 0 0.75rem 1.75rem rgba(36, 40, 34, 0.07);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-soft);
   margin-left: auto;
   margin-right: auto;
   max-width: 960px;
@@ -134,7 +166,7 @@ a:hover {
 }
 
 .nav-underline .nav-link {
-  color: var(--dimock-ink);
+  color: var(--ink);
 }
 
 .nav-underline {
@@ -146,7 +178,7 @@ a:hover {
 .nav-underline .nav-link:hover,
 .nav-underline .nav-link:focus,
 .nav-underline .nav-link.active {
-  color: var(--dimock-green-dark);
+  color: var(--pine-deep);
 }
 
 .nav-underline .nav-link:focus {
@@ -156,17 +188,17 @@ a:hover {
 
 .nav-underline .nav-link:focus-visible {
   border-radius: 0.15rem;
-  box-shadow: 0 0 0 0.16rem rgba(25, 135, 84, 0.2);
-  outline: 2px solid rgba(25, 135, 84, 0.38);
+  box-shadow: 0 0 0 0.16rem rgba(44, 87, 65, 0.2);
+  outline: 2px solid rgba(44, 87, 65, 0.4);
   outline-offset: 0.2rem;
 }
 
 .inline-reference {
   background: transparent;
   border: 0;
-  border-bottom: 1px dotted var(--dimock-green-dark);
+  border-bottom: 1px dotted var(--pine-deep);
   border-radius: 0;
-  color: var(--dimock-green-dark);
+  color: var(--pine-deep);
   font: inherit;
   padding: 0;
   text-decoration: none;
@@ -174,49 +206,63 @@ a:hover {
 
 .inline-reference:hover,
 .inline-reference:focus {
-  color: var(--dimock-green);
-  border-bottom-color: var(--dimock-green);
+  color: var(--pine);
+  border-bottom-color: var(--pine);
+}
+
+/* .btn-success and .btn-outline-success hardcode #198754 in their own
+   --bs-btn-* properties rather than reading --bs-success-rgb, so the :root
+   remapping above does not reach them. */
+.btn-success {
+  --bs-btn-bg: var(--pine);
+  --bs-btn-border-color: var(--pine);
+  --bs-btn-hover-bg: var(--pine-deep);
+  --bs-btn-hover-border-color: var(--pine-deep);
+  --bs-btn-active-bg: var(--pine-deep);
+  --bs-btn-active-border-color: var(--pine-deep);
+  --bs-btn-disabled-bg: var(--pine);
+  --bs-btn-disabled-border-color: var(--pine);
 }
 
 .btn-outline-success {
-  --bs-btn-color: var(--dimock-green-dark);
-  --bs-btn-border-color: var(--dimock-green-dark);
-  --bs-btn-hover-bg: var(--dimock-green-dark);
-  --bs-btn-hover-border-color: var(--dimock-green-dark);
-  --bs-btn-active-bg: var(--dimock-green-dark);
-  --bs-btn-active-border-color: var(--dimock-green-dark);
+  --bs-btn-color: var(--pine-deep);
+  --bs-btn-border-color: var(--pine-deep);
+  --bs-btn-hover-bg: var(--pine-deep);
+  --bs-btn-hover-border-color: var(--pine-deep);
+  --bs-btn-active-bg: var(--pine-deep);
+  --bs-btn-active-border-color: var(--pine-deep);
 }
 
 .notice {
-  background: var(--dimock-paper);
-  border: 1px solid var(--dimock-border);
-  border-left: 0.35rem solid var(--dimock-green);
-  color: var(--dimock-ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 0.35rem solid var(--ochre);
+  color: var(--ink);
 }
 
 .event-card {
-  border: 1px solid var(--dimock-border);
-  box-shadow: 0 0.6rem 1.25rem rgba(36, 40, 34, 0.07);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-soft);
 }
 
 .event-date {
-  background: var(--dimock-paper);
-  box-shadow: inset -1px 0 0 var(--dimock-border);
+  background: var(--paper);
+  box-shadow: inset -1px 0 0 var(--rule);
 }
 
 .event-date-sunday {
-  color: var(--dimock-green-dark);
+  color: var(--pine-deep);
 }
 
 .event-date-saturday {
-  color: var(--dimock-red);
+  color: var(--ochre-ink);
 }
 
 .address-callout {
-  background: #eef5ec;
-  border: 1px solid var(--dimock-border);
-  border-left: 0.35rem solid var(--dimock-green);
-  color: var(--dimock-green-dark);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 0.35rem solid var(--ochre);
+  color: var(--ink);
 }
 
 .attraction-list li {
@@ -230,22 +276,22 @@ a:hover {
 }
 
 .modal-content {
-  background: var(--dimock-paper);
-  border-color: var(--dimock-border);
+  background: var(--paper);
+  border-color: var(--rule);
 }
 
 .modal-header {
-  border-bottom-color: var(--dimock-border);
+  border-bottom-color: var(--rule);
 }
 
 .modal-body img {
-  box-shadow: 0 0.6rem 1.5rem rgba(36, 40, 34, 0.12);
+  box-shadow: var(--shadow-soft);
 }
 
 .carousel-item img {
   max-height: 75vh;
   object-fit: contain;
-  background: var(--dimock-ink);
+  background: var(--ink);
 }
 
 @media (max-width: 575.98px) {
