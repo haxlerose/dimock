@@ -1,8 +1,17 @@
 # Dimock Camp Meeting Ground — Site Notes
 
-Static HTML site for a Methodist camp meeting ground in Dimock, PA (est. 1875).
+Static HTML site for a Methodist camp meeting ground in Dimock, PA (est. 1877).
 
 `AGENTS.md` is a symlink to this file — edit this one.
+
+**The founding year is 1877 — do not "fix" it to 1875.** `about.html` narrates a
+lot of 1875 (the grounds were leased that July, the first camp meeting-style
+preaching was August 25, 1875), so 1875 looks like the founding year from that
+page alone. It is not. The grounds were chartered August 15, 1877, the signage on
+the property reads "Since 1877", and the 150th year is 2027 — which only works
+from 1877. `events.html` agrees: 2026 is the 149th season. Confirmed by the owner
+2026-07-27. `about.html` is the source of truth for the *events* of the history,
+not for the founding year.
 
 ## Design authority
 
