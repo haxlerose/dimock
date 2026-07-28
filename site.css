@@ -472,6 +472,16 @@ img {
 
 /* The only two button styles. Reserve them for real actions — a trigger that
    sits inside a sentence is an .inline-reference, not a button. */
+/* A button set straight under a heading sits too close to it, even though the
+   box gap is identical to a paragraph's. A paragraph's first line carries about
+   6px of half-leading above the cap height; a pill's edge carries none, so the
+   same 8px measures 14px to the eye above text and 8px above a button. This
+   puts the missing half-leading back, so a button and a paragraph look equally
+   far below the heading they belong to. */
+:is(h2, h3) + p > :is(.btn-pine, .btn-pine-outline) {
+  margin-top: 0.375rem;
+}
+
 .btn-pine,
 .btn-pine-outline {
   border-radius: 2rem;
