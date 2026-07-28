@@ -255,10 +255,12 @@ alternating off-white band) · `.container-narrow` (1180px) · `.eyebrow` (small
 caps over a short rule, opens a section) · `.lede` · `.measure` · `.statement` +
 `.statement__label` + `.statement__text` (what mission/vision look like instead of
 filled cards) · `.figure-tile` (+ `.figure-lead` for a wide lead image, `.figure-uncropped`
-for a photograph that must keep its own proportions) · `.pullquote` · `.milestones` ·
+for a photograph that must keep its own proportions, `.figure-portrait` to stop a small
+scan being blown up past its own size) · `.pullquote` · `.milestones` ·
 `.address-display` (an address as display type; `.address-callout` is the boxed one) ·
 `.btn-pine` / `.btn-pine-outline` (the only two button styles) · `.inline-reference` ·
-`.notice` · `.no-break`.
+`.notice` · `.no-break` · `.page-contents` (the in-page contents list at the top of a
+long article) · `.prayer` (the one centered block on the site).
 
 **The `ch` trap.** `--measure` is `66ch`, and `ch` resolves against each element's own
 font size — so `.measure` on a `.lede` yields a column a third wider than `.measure` on
@@ -355,13 +357,45 @@ rather than naming a date. **Pasting in a new season must leave `checks/run.sh` 
 with no edit to `checks/`** — verified against a six-card 2027 season, and against
 four deliberate breaks, each of which a spec named.
 
-## Tab pattern (about, services, visit)
+## Anchored sections (about, services)
 
-Tabs use `nav-underline` with the same ochre active underline as the site nav; the
-panes sit in a `.section` + `.container-narrow`, with `.tab-pane` capping the reading
-column at `--measure`. Each pane opens with an `.eyebrow` above a left-aligned `<h2>`.
-Phase 7 replaces the tabs with anchored sections. Note the panes still carry positive
-`tabindex` values, which breaks keyboard order — Phase 7 removes them.
+Phase 7 took both pages out of tabs. Each page is now a masthead `.section` — `<h1>`,
+optionally a `.lede`, and a `.page-contents` list of in-page links — followed by one
+`.section` per topic, alternating with `.section-paper`. A section is:
+
+```html
+<div class="section section-paper">
+  <div class="container container-narrow">
+    <div class="measure">
+      <p class="eyebrow">Since 1877</p>
+      <h2 id="history">Dimock's History</h2>
+      <h3 id="founding">Founding and Early Organization</h3>
+      ...
+```
+
+**Every `<h2>` and `<h3>` in a section carries an `id`**, because every one of them is
+something a visitor may be sent a link to. `:is(h1,h2,h3)[id]` gets
+`scroll-margin-top: 7rem` so arriving by fragment does not park the heading under the
+sticky nav; `sections-are-anchored` visits each fragment and measures it. The reading
+column comes from `.measure` on a wrapper div — one column for the whole section, not
+one per child, for the same reason `.tab-pane` did it that way.
+
+Heading levels are `h1` → `h2` (section) → `h3` (sub-heading), no skips.
+`heading-order-intact` covers `index`, `about`, and `services`.
+
+The prayer on `services.html` is the one deliberate centering exception: `.measure
+.prayer`, which centers the text and the column together.
+
+## Tab pattern (visit only)
+
+`visit.html` is the last page still using tabs; Phase 8 takes it out too. Tabs use
+`nav-underline` with the same ochre active underline as the site nav; the panes sit in
+a `.section` + `.container-narrow`, with `.tab-pane` capping the reading column at
+`--measure`. Each pane opens with an `.eyebrow` above a left-aligned `<h2>`.
+
+**No positive `tabindex` anywhere.** A positive value does not move one element
+forward, it moves every element without one to the back of the queue for the whole
+page. The panes carry `tabindex="0"`; `no-positive-tabindex` runs on all six pages.
 
 ## Modal pattern
 
@@ -369,6 +403,12 @@ Inline text triggers use `class="inline-reference"` (a dotted-underline text
 button styled in `site.css`) — never a `btn`. `.btn-pine-outline` is for genuine
 standalone actions only: the photo-gallery openers on `visit.html` and the two
 external links. Image-only modals use `modal-xl`; text modals use the default size.
+
+**A modal is for a genuine aside, never for a photograph.** Phase 7 brought the history
+images onto the page, so what is left is `#wyalusing`, `#ira-walker`, and `#stock` on
+`about.html` and `#poster` on `services.html` — three digressions and two documents you
+need to zoom in to read. `history-images-inline` fails if one of those pictures goes
+back to being reachable only through a trigger.
 
 ## Working rules
 

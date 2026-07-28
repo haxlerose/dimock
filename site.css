@@ -348,6 +348,13 @@ img {
   aspect-ratio: auto;
 }
 
+/* Some of the historic portraits are 400px scans. Stretched across the whole
+   reading column they go visibly soft, so they sit at roughly their own size
+   instead. This is a ceiling, not a width: the tile still shrinks on a phone. */
+.figure-portrait {
+  max-width: 25rem;
+}
+
 .figure-tile figcaption {
   color: var(--muted);
   font-size: 0.87rem;
@@ -624,15 +631,12 @@ img {
    against each element's own font-size, so per-child caps left the headings
    hanging outside the paragraphs' left edge. The column is flush left with the
    page title above it — a centred column beside a left-aligned heading reads
-   as a mistake. */
+   as a mistake.
+
+   Phase 7 took about.html and services.html out of tabs; visit.html is the last
+   page still using this, and Phase 8 takes it out too. */
 .tab-pane {
   max-width: var(--measure);
-}
-
-/* The prayer is the one deliberate exception to left-aligned prose. Its column
-   is centred too — centred text in a flush-left column reads as a mistake. */
-.tab-pane.text-center {
-  margin-inline: auto;
 }
 
 /* A sub-heading belongs to what follows it, not to what precedes it. */
@@ -642,6 +646,64 @@ img {
 
 .tab-pane > h5:first-of-type {
   margin-top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Anchored sections (Phase 7)
+   --------------------------------------------------------------------------- */
+
+/* Arriving by fragment has to leave the heading readable. Without this the
+   sticky nav parks itself over the very heading the link promised, and the
+   visitor lands mid-paragraph on a page that looks like it went to the wrong
+   place. `sections-are-anchored` measures exactly that. */
+:is(h1, h2, h3)[id] {
+  scroll-margin-top: 7rem;
+}
+
+/* A sub-heading inside a section belongs to what follows it. */
+.section h3 {
+  margin-top: 2.75rem;
+}
+
+.section h3:first-child {
+  margin-top: 0;
+}
+
+/* A photograph set into a reading column needs air on both sides of it, and
+   more above than a paragraph would take. */
+.section .figure-tile {
+  margin-block: 2.75rem;
+}
+
+/* The contents list at the top of a long article. Links, not buttons — each one
+   goes somewhere, and the page works with the stylesheet stripped away. */
+.page-contents {
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem 0 0;
+}
+
+.page-contents a {
+  color: var(--pine-deep);
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.page-contents a:hover,
+.page-contents a:focus {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* The prayer is the one deliberate exception to left-aligned prose. Its column
+   is centred too — centred text in a flush-left column reads as a mistake. */
+.prayer {
+  margin-inline: auto;
+  text-align: center;
 }
 
 /* The in-page tabs take the same ochre underline as the site nav, so "where am

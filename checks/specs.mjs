@@ -135,6 +135,17 @@ const seasonClock = (pick, time) => async (page) => {
 // Text sitting over a photograph has no computable background. The hero is the
 // only such place on the site; its type is white on a dark scrim with a text
 // shadow and is reviewed by eye in the --shots pass.
+/**
+ * The photographs that were locked inside modals before Phase 7, and the page
+ * whose text each one illustrates. A modal copy may still exist for a document
+ * you have to read close up — the stock certificate and the 1936 poster — but
+ * the picture itself has to be on the page, where someone scrolling will see it.
+ */
+const HISTORY_IMAGES = {
+  about: ["walker.jpg", "train.jpg", "stock.jpg", "meeting.jpg", "taylor.jpg", "towner.jpg", "pinchot.jpg"],
+  services: ["poster.jpg", "meeting.jpg"],
+};
+
 const CONTRAST_SKIP_SUBTREES = [".hero"];
 
 /**
@@ -735,10 +746,25 @@ export const specs = [
           : `${long.length} long paragraph(s) still centred, first: "${long[0]}"`;
       }
 
-      const prayer = await centered("#prayer-tab-pane p");
-      const rekindling = await centered("#rekindling-tab-pane p");
-      if (prayer === null) return "found no paragraphs in #prayer-tab-pane";
-      if (rekindling === null) return "found no paragraphs in #rekindling-tab-pane";
+      // Phase 7 replaced the tab panes with anchored sections, so these are
+      // found through the heading the visitor can actually link to rather than
+      // through a pane id. The Rekindling content is a list now, not paragraphs.
+      const inSectionOf = (id, childSelector) =>
+        page.evaluate(
+          ([anchor, sel]) => {
+            const section = document.getElementById(anchor)?.closest(".section");
+            if (!section) return null;
+            const nodes = Array.from(section.querySelectorAll(sel));
+            if (nodes.length === 0) return null;
+            return nodes.every((el) => getComputedStyle(el).textAlign === "center");
+          },
+          [id, childSelector]
+        );
+
+      const prayer = await inSectionOf("prayer", "p");
+      const rekindling = await inSectionOf("rekindling", "li");
+      if (prayer === null) return "found no prayer text under #prayer";
+      if (rekindling === null) return "found no list items under #rekindling";
       if (!prayer) return "the prayer should stay centred, and is not";
       return rekindling ? "the Rekindling list is still centred" : null;
     },
@@ -957,7 +983,7 @@ export const specs = [
   },
   {
     id: "heading-order-intact",
-    pages: ["index"],
+    pages: ["index", "about", "services"],
     check: async (page) => {
       const headings = await page.evaluate(() =>
         Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
@@ -1323,5 +1349,124 @@ export const specs = [
           ? null
           : `without JavaScript the events read ${rendered}, expected the served order ${served}`;
       }),
+  },
+  {
+    id: "no-tabs-on-about-and-services",
+    pages: ["about", "services"],
+    check: async (page) => {
+      const found = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('[data-bs-toggle="tab"]')).map((el) =>
+          (el.textContent ?? "").replace(/\s+/g, " ").trim()
+        )
+      );
+      return found.length === 0
+        ? null
+        : `${found.length} tab trigger(s) remain, first: "${found[0]}"`;
+    },
+  },
+  {
+    id: "sections-are-anchored",
+    pages: ["about", "services"],
+    check: async (page) => {
+      const headings = await page.evaluate(() =>
+        Array.from(document.querySelectorAll(".section h2")).map((el) => ({
+          id: el.id,
+          text: el.textContent.replace(/\s+/g, " ").trim().slice(0, 40),
+        }))
+      );
+      if (headings.length === 0) return "the page has no section headings";
+      const unnamed = headings.filter((heading) => !heading.id);
+      if (unnamed.length > 0) {
+        return `${unnamed.length} section heading(s) have no id, first: "${unnamed[0].text}"`;
+      }
+
+      // An id is only half of it. Arriving by fragment has to leave the heading
+      // where it can be read — the sticky nav sits over the top of the page and
+      // will happily cover the very thing the link promised.
+      const covered = [];
+      for (const heading of headings) {
+        const measured = await page.evaluate((id) => {
+          location.hash = `#${id}`;
+          const nav = document.querySelector(".site-nav");
+          const target = document.getElementById(id);
+          return {
+            navBottom: nav.getBoundingClientRect().bottom,
+            headingTop: target.getBoundingClientRect().top,
+          };
+        }, heading.id);
+        if (measured.headingTop < measured.navBottom - 1) covered.push(heading);
+      }
+      await page.evaluate(() => {
+        history.replaceState(null, "", location.pathname);
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
+
+      return covered.length === 0
+        ? null
+        : `${covered.length} anchored heading(s) land under the sticky nav, first: "#${covered[0].id}"`;
+    },
+  },
+  {
+    id: "no-positive-tabindex",
+    pages: ALL,
+    check: async (page) => {
+      // A positive tabindex does not move one element forward; it moves every
+      // element without one to the back of the queue, for the whole page.
+      const positive = await page.evaluate(() =>
+        Array.from(document.querySelectorAll("[tabindex]"))
+          .map((el) => ({
+            value: el.getAttribute("tabindex"),
+            where: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}`,
+          }))
+          .filter((entry) => Number(entry.value) > 0)
+      );
+      return positive.length === 0
+        ? null
+        : `${positive.length} positive tabindex value(s), first: ${positive[0].where} has tabindex="${positive[0].value}"`;
+    },
+  },
+  {
+    id: "history-images-inline",
+    pages: ["about", "services"],
+    check: async (page, ctx) => {
+      const missing = await page.evaluate((wanted) => {
+        const inline = new Set(
+          Array.from(document.querySelectorAll("img"))
+            .filter((img) => !img.closest(".modal"))
+            .map((img) => (img.getAttribute("src") ?? "").split("/").pop())
+        );
+        return wanted.filter((file) => !inline.has(file));
+      }, HISTORY_IMAGES[ctx.name]);
+      return missing.length === 0
+        ? null
+        : `${missing.length} photograph(s) still reachable only through a modal: ${missing.join(", ")}`;
+    },
+  },
+  {
+    id: "images-have-alt",
+    pages: ["about", "services"],
+    check: async (page, ctx) => {
+      const report = await page.evaluate((wanted) => {
+        const images = Array.from(document.querySelectorAll("img")).map((img) => ({
+          file: (img.getAttribute("src") ?? "").split("/").pop(),
+          alt: img.getAttribute("alt"),
+        }));
+        return {
+          absent: images.filter((img) => img.alt === null).map((img) => img.file),
+          // The photographs this phase brought out of the modals carry the
+          // history. None of them is decoration, so none may take alt="".
+          empty: images
+            .filter((img) => wanted.includes(img.file) && (img.alt ?? "").trim() === "")
+            .map((img) => img.file),
+        };
+      }, HISTORY_IMAGES[ctx.name]);
+
+      if (report.absent.length > 0) {
+        return `${report.absent.length} image(s) have no alt attribute at all, first: ${report.absent[0]}`;
+      }
+      return report.empty.length === 0
+        ? null
+        : `${report.empty.length} history photograph(s) carry alt="": ${report.empty.join(", ")}`;
+    },
   },
 ];
