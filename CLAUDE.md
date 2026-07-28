@@ -74,7 +74,7 @@ gitignored.
 | File | Scope |
 |------|-------|
 | `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, the shared shell, and the whole component vocabulary. |
-| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. `site.css` has now adopted every component from it; what remains here is the prototype's own homepage layout (`.hero__*`, `.next-service`, `.grove`, `.visit`), which Phase 5 ports. |
+| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. `site.css` has now adopted everything it is going to: the components in Phase 4 and the homepage layout in Phase 5. Nothing here is still pending a port; Phase 9 deletes it. |
 
 `prototype.css` is scaffolding, not a second live stylesheet: only
 `index-prototype.html` links it, and nothing links to that page. The new system lands
@@ -85,7 +85,7 @@ restructured; Phase 9 deletes both prototype files.
 
 | File | Content |
 |------|---------|
-| `index.html` | Hero + mission/vision statements + heritage. Phase 5 rebuilds it. |
+| `index.html` | Editorial hero, next-service band, mission/vision, photography, heritage + milestones, address strip. Rebuilt in Phase 5. |
 | `index-prototype.html` | First-draft editorial homepage, reference only — not linked, not deployed. |
 | `about.html` | Tabbed: history + landmark designation; many modals |
 | `services.html` | Tabbed: camp meeting / rekindling / prayer; modals |
@@ -154,10 +154,36 @@ and fail on any other difference.
 Colors, the sticky behavior, the translucent background, and the toggler icon all
 come from `site.css`. Pages carry no inline `<style>` block.
 
-## Hero pattern (index, contact)
+## Hero pattern
 
-Full-bleed image with overlay; sizing and text shadow come from `site.css`
-(`.hero`, `.hero-overlay`, `.hero-title`, `.hero-subtitle`).
+Two spellings exist, both carrying `.hero` so the contrast spec's skip list —
+which cannot measure text over a photograph — reaches either.
+
+**`index.html` — the editorial hero (`.hero .hero-feature`).** The approved
+direction: the image fills the block, a gradient `.hero__scrim` darkens only the
+bottom where the type sits, and the type sets flush left at the bottom.
+
+```html
+<header class="hero hero-feature">
+  <img src="chapel.jpg" alt="" class="hero__img" width="1000" height="672">
+  <div class="hero__scrim"></div>
+  <div class="hero__body">
+    <div class="container container-narrow">
+      <p class="hero__eyebrow">...</p>
+      <h1 class="hero__title">...</h1>
+      <p class="hero__subtitle">...</p>
+    </div>
+  </div>
+</header>
+```
+
+The hero image is decorative — the `<h1>` beside it carries the meaning — so it
+takes `alt=""` and is the **one** image on the page exempt from `loading="lazy"`.
+
+**`contact.html` — the old centered hero (`.hero`, `.hero-overlay`,
+`.hero-title`, `.hero-subtitle`).** Full-bleed image under a flat overlay with
+the text shadowed and vertically centered. Phase 8 moves it onto
+`.hero-feature`, after which those four rules go.
 
 ```html
 <div class="hero position-relative overflow-hidden d-flex align-items-center">
@@ -177,18 +203,37 @@ Full-bleed image with overlay; sizing and text shadow come from `site.css`
 </div>
 ```
 
-The approved direction moves hero text to bottom-left over a gradient scrim
-(`.hero__*` in `prototype.css`).
+## The next-service band (index)
+
+`.next-service` is the pine-deep strip under the homepage hero. **Its markup is
+the no-JavaScript fallback and must read true on any date** — "Sunday evening
+services at 6:00 pm" always is. The `data-ns="eyebrow|headline|meta"` slots are
+where Phase 6's `schedule.js` will write a real date; anything that writes them
+must leave the fallback alone when it has nothing better to say, including
+off-season. `next-service-fallback-truthful` loads the page in a browser with
+JavaScript switched off and fails if the band names a month or a year.
+
+There is deliberately **no inline `SCHEDULE` array** — the prototype had one and
+it duplicates `events.html`, which is the thing the owner rejected.
 
 ## Component vocabulary
 
-Landed in `site.css` (Phase 4), ported from `prototype.css`. **Check this list before
-inventing a component.** `.section` (page band) · `.section-paper` (the alternating
-off-white band) · `.container-narrow` (1180px) · `.eyebrow` (small ochre caps over a
-short rule, opens a section) · `.lede` · `.measure` · `.statement` + `.statement__label`
-+ `.statement__text` (what mission/vision look like instead of filled cards) ·
-`.figure-tile` · `.pullquote` · `.milestones` · `.btn-pine` / `.btn-pine-outline` (the
-only two button styles) · `.inline-reference` · `.notice` · `.no-break`.
+Landed in `site.css` (Phases 4 and 5), ported from `prototype.css`. **Check this list
+before inventing a component.** `.section` (page band) · `.section-paper` (the
+alternating off-white band) · `.container-narrow` (1180px) · `.eyebrow` (small ochre
+caps over a short rule, opens a section) · `.lede` · `.measure` · `.statement` +
+`.statement__label` + `.statement__text` (what mission/vision look like instead of
+filled cards) · `.figure-tile` (+ `.figure-lead` for a wide lead image, `.figure-uncropped`
+for a photograph that must keep its own proportions) · `.pullquote` · `.milestones` ·
+`.address-display` (an address as display type; `.address-callout` is the boxed one) ·
+`.btn-pine` / `.btn-pine-outline` (the only two button styles) · `.inline-reference` ·
+`.notice` · `.no-break`.
+
+**The `ch` trap.** `--measure` is `66ch`, and `ch` resolves against each element's own
+font size — so `.measure` on a `.lede` yields a column a third wider than `.measure` on
+body text. `.lede.measure` is capped at `54ch` for that reason, which is the same
+physical width. Any future component set larger than body copy needs the same treatment;
+`measure-capped` fails at 780px and will catch it.
 
 Headings inside a `.section` take `--pine-deep` from a single rule; the ochre in a band
 is carried by the eyebrow above the heading. Every `a`, `button`, `.btn`, and

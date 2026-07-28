@@ -22,6 +22,7 @@
      the translucent nav and the footer's tints. There is no build step to do
      the arithmetic, so the channels are written out once here. */
   --paper-rgb:  255, 253, 248;
+  --scrim-rgb:  18, 24, 18;   /* the gradient over hero photography only */
 
   --shadow-soft: 0 0.75rem 1.75rem rgba(35, 38, 31, 0.07);
   --measure:     66ch;
@@ -92,6 +93,14 @@ h4 {
 /* Caps line length for sustained reading. */
 .measure {
   max-width: var(--measure);
+}
+
+/* `ch` resolves against the element's own font size, so a lede capped at 66ch
+   runs a third wider than body text capped at the same 66ch. 54ch at the lede's
+   size is the same physical column as --measure at the body's — which is the
+   point of capping it at all. */
+.lede.measure {
+  max-width: 54ch;
 }
 
 .no-break {
@@ -326,6 +335,19 @@ img {
   width: 100%;
 }
 
+/* A wide lead image above a row of smaller ones. Cropping a 3:2 original this
+   far keeps the sky band and the subject; at 390px the crop is too severe and
+   the tile goes back to the original's own shape. */
+.figure-lead img {
+  aspect-ratio: 12 / 5;
+}
+
+/* A photograph shown at its own proportions. Historic images are the reason
+   this exists — a 4:3 crop cuts the picture rather than framing it. */
+.figure-uncropped img {
+  aspect-ratio: auto;
+}
+
 .figure-tile figcaption {
   color: var(--muted);
   font-size: 0.87rem;
@@ -375,6 +397,70 @@ img {
   font-size: 0.92rem;
   line-height: 1.5;
   margin: 0.55rem 0 0;
+}
+
+/* The dark band directly under the hero. The markup inside it is a fallback
+   that has to read true on any date; script may sharpen it, never gate it. */
+.next-service {
+  background: var(--pine-deep);
+  color: rgba(var(--paper-rgb), 0.88);
+}
+
+.next-service__inner {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2.5rem;
+  padding-block: 1.85rem;
+}
+
+.next-service__eyebrow {
+  color: var(--ochre-lift);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+}
+
+.next-service__headline {
+  color: var(--paper);
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: clamp(1.3rem, 2.6vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.next-service__meta {
+  font-size: 0.95rem;
+  margin: 0.45rem 0 0;
+}
+
+.next-service .btn-pine-outline {
+  border-color: rgba(var(--paper-rgb), 0.5);
+  color: var(--paper);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.next-service .btn-pine-outline:hover,
+.next-service .btn-pine-outline:focus {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--pine-deep);
+}
+
+/* A street address set as display type rather than boxed. .address-callout is
+   the boxed treatment, for a page where the address is the answer. */
+.address-display {
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin: 0 0 0.6rem;
 }
 
 /* The only two button styles. Reserve them for real actions — a trigger that
@@ -456,10 +542,82 @@ img {
   line-height: 1.3;
 }
 
-.heritage-band {
-  background: var(--paper);
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
+/* ---------------------------------------------------------------------------
+   The editorial hero — type at bottom-left over a gradient scrim. The homepage
+   uses it; contact.html still uses the centred .hero above, and Phase 8 moves
+   it across, after which the .hero-overlay / .hero-title / .hero-subtitle rules
+   go. Both spellings carry .hero so the contrast spec's skip list, which cannot
+   measure text over a photograph, reaches either one.
+   --------------------------------------------------------------------------- */
+.hero-feature {
+  align-items: flex-end;
+  display: flex;
+  height: auto;
+  max-height: none;
+  min-height: min(78vh, 660px);
+  overflow: hidden;
+  position: relative;
+}
+
+.hero__img {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center 42%;
+  position: absolute;
+  width: 100%;
+}
+
+/* A gradient rather than a flat wash: the photograph stays bright at the top
+   and only darkens where the type actually sits. */
+.hero__scrim {
+  background: linear-gradient(
+    to top,
+    rgba(var(--scrim-rgb), 0.88) 0%,
+    rgba(var(--scrim-rgb), 0.62) 26%,
+    rgba(var(--scrim-rgb), 0.22) 52%,
+    rgba(var(--scrim-rgb), 0.06) 100%
+  );
+  inset: 0;
+  position: absolute;
+}
+
+.hero__body {
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  position: relative;
+  width: 100%;
+}
+
+.hero__eyebrow {
+  color: rgba(var(--paper-rgb), 0.9);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.hero__eyebrow::before {
+  background: var(--ochre);
+  content: "";
+  display: block;
+  height: 2px;
+  margin-bottom: 0.9rem;
+  width: 2.75rem;
+}
+
+.hero__title {
+  color: var(--paper);
+  font-size: clamp(2.4rem, 6.4vw, 4.4rem);
+  margin: 0;
+  max-width: 16ch;
+}
+
+.hero__subtitle {
+  color: rgba(var(--paper-rgb), 0.92);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  margin: 1.1rem 0 0;
+  max-width: 36ch;
 }
 
 /* One reading column for the whole pane, not one per child: `ch` resolves
@@ -671,6 +829,17 @@ img {
     right: auto;
     width: 2rem;
   }
+
+  /* Stacked, the button sits under the copy rather than out at the right. */
+  .next-service .btn-pine-outline {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .figure-lead img {
+    aspect-ratio: 3 / 2;
+  }
 }
 
 @media (max-width: 575.98px) {
@@ -680,6 +849,12 @@ img {
 
   .hero {
     min-height: 390px;
+  }
+
+  /* The rule above is for the centred hero; the editorial one keeps its own
+     proportion at every width. */
+  .hero-feature {
+    min-height: min(78vh, 660px);
   }
 }
 

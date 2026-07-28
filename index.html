@@ -44,21 +44,35 @@
       </div>
     </nav>
 
-    <div class="hero position-relative overflow-hidden d-flex align-items-center">
-      <img src="chapel.jpg" alt="Background image" class="img-fluid position-absolute w-100 h-100" style="object-fit: cover; object-position: center;" />
-      <div class="hero-overlay position-absolute w-100 h-100"></div>
-      <div class="position-relative w-100 px-3 px-md-0">
-        <div class="container">
-          <div class="row">
-            <div class="col-12 col-md-8 col-lg-6 ms-md-auto">
-              <h1 class="hero-title display-3 fw-bold text-light">DIMOCK Camp Meeting Ground</h1>
-              <h4 class="hero-subtitle text-light mt-3">Serving Christ in the Endless Mountains</h4>
-            </div>
-          </div>
+    <header class="hero hero-feature">
+      <img src="chapel.jpg" alt="" class="hero__img" width="1000" height="672">
+      <div class="hero__scrim"></div>
+      <div class="hero__body">
+        <div class="container container-narrow">
+          <p class="hero__eyebrow">Gathering in the grove since 1877</p>
+          <h1 class="hero__title">Dimock Camp Meeting Ground</h1>
+          <p class="hero__subtitle">Serving Christ in the Endless Mountains</p>
         </div>
       </div>
-    </div>
-    <div class="section">
+    </header>
+
+    <!-- The copy below is the no-JavaScript fallback, and it is true on any
+         date. Anything that later sharpens it must leave this in place when it
+         has nothing better to say. -->
+    <section class="next-service" id="next-service" aria-label="Service times">
+      <div class="container container-narrow">
+        <div class="next-service__inner">
+          <div>
+            <p class="next-service__eyebrow" data-ns="eyebrow">This season</p>
+            <p class="next-service__headline" data-ns="headline">Sunday evening services at 6:00&nbsp;pm</p>
+            <p class="next-service__meta" data-ns="meta">In the chapel, with fellowship and refreshments to follow</p>
+          </div>
+          <a class="btn-pine-outline" href="events.html">See the full schedule</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
       <div class="container container-narrow">
         <div class="row g-4 g-lg-5">
           <div class="col-12 col-lg-6">
@@ -80,26 +94,122 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="section heritage-band">
+    <section class="section section-paper">
       <div class="container container-narrow">
-        <p class="eyebrow">Since 1877</p>
-        <h2>Our Heritage</h2>
-        <p class="measure mt-4 mb-0">
-          The Dimock Camp Meeting traces its roots back to 1875 when a decision was made
-          by several Methodist Episcopal congregations in the region to create "a
-          permanent campmeeting ground" in the then Wyalusing District of the Methodist
-          Church. Its purposes were spiritual revival and evangelization as the "plain
-          gospel" was proclaimed and taught. The Camp Meeting was chartered in
-          1877. When the Wyalusing District was dissolved in 1878, few would have
-          dreamed that it could sustain itself. But God has worked in wondrous yet
-          mysterious ways, and we are pleased to welcome you once again in <span id="current-year">2026</span> to
-          take part in a series of Sunday evening worship experiences in the
-          chapel followed by refreshments.
+        <p class="eyebrow">The grounds</p>
+        <h2>Twenty-three acres of grove, pond and porch</h2>
+        <p class="lede measure text-muted mt-3 mb-5">
+          About a hundred cottages around an open square, a chapel, a pavilion, a pond
+          and nearly a mile of nature trail &mdash; the same ground families have been
+          coming back to for a century and a half.
         </p>
+
+        <figure class="figure-tile figure-lead">
+          <img src="sunset.jpg" alt="A wooden cross silhouetted against the sunset over the valley, framed by two large trees." loading="lazy" width="1200" height="806">
+          <figcaption>Sunset Point, overlooking the valley below.</figcaption>
+        </figure>
+
+        <div class="row g-4 mt-3">
+          <div class="col-12 col-md-4">
+            <figure class="figure-tile">
+              <img src="lewislodge.jpg" alt="A two-storey white cottage with a gabled porch and decorative trim, set among the trees." loading="lazy" width="1000" height="672">
+              <figcaption>One of the cottages that grew up around the square.</figcaption>
+            </figure>
+          </div>
+          <div class="col-12 col-md-4">
+            <figure class="figure-tile">
+              <img src="campfire.jpg" alt="People gathered around a campfire at dusk, with a lit cottage and a large white building behind them." loading="lazy" width="1200" height="806">
+              <figcaption>Singing around the campfire in the camp square.</figcaption>
+            </figure>
+          </div>
+          <div class="col-12 col-md-4">
+            <figure class="figure-tile">
+              <img src="bears1.jpg" alt="A black bear cub perched in the crook of a small tree beside a hanging basket of flowers, with a larger bear in the grass below." loading="lazy" width="1001" height="674">
+              <figcaption>One of the bears photographed near the pond.</figcaption>
+            </figure>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section class="section">
+      <div class="container container-narrow">
+        <div class="row g-4 g-lg-5 align-items-start">
+          <div class="col-12 col-lg-6">
+            <figure class="figure-tile figure-uncropped mb-0">
+              <img src="meeting.jpg" alt="A sepia photograph from the 1890s showing a large crowd seated on wooden benches among the trees at a camp meeting." loading="lazy" width="2560" height="1684">
+              <figcaption>Camp Meeting in the 1890s.</figcaption>
+            </figure>
+          </div>
+          <div class="col-12 col-lg-6">
+            <p class="eyebrow">Since 1877</p>
+            <h2 class="mb-4">Our Heritage</h2>
+            <p>
+              The Dimock Camp Meeting traces its roots back to 1875 when a decision was made
+              by several Methodist Episcopal congregations in the region to create "a
+              permanent campmeeting ground" in the then Wyalusing District of the Methodist
+              Church. Its purposes were spiritual revival and evangelization as the "plain
+              gospel" was proclaimed and taught.
+            </p>
+            <blockquote class="pullquote">
+              Let all who cherish the vision of a beautiful grove come forth.
+              <cite>The call to the workbee at Dimock, July 1875</cite>
+            </blockquote>
+            <p>
+              The Camp Meeting was chartered in 1877. When the Wyalusing District was
+              dissolved in 1878, few would have dreamed that it could sustain itself. But God
+              has worked in wondrous yet mysterious ways, and we are pleased to welcome you
+              once again in <span id="current-year">2026</span> to take part in a series of
+              Sunday evening worship experiences in the chapel followed by refreshments.
+            </p>
+            <p class="mt-4 mb-0">
+              <a href="about.html">Read the full history of the grounds</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="milestones">
+          <div class="milestone">
+            <div class="milestone__year">1877</div>
+            <p class="milestone__label">Chartered on August 15 as the Wyalusing District Camp Meeting Association</p>
+          </div>
+          <div class="milestone">
+            <div class="milestone__year">1940</div>
+            <p class="milestone__label">The chapel completed, where Sunday evening services are still held</p>
+          </div>
+          <div class="milestone">
+            <div class="milestone__year">2002</div>
+            <p class="milestone__label">Designated a United Methodist Church heritage landmark</p>
+          </div>
+          <div class="milestone">
+            <div class="milestone__year">2027</div>
+            <p class="milestone__label">The 150th season on the grounds</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-paper">
+      <div class="container container-narrow">
+        <div class="row g-4 align-items-center">
+          <div class="col-12 col-lg-7">
+            <p class="eyebrow">Find us</p>
+            <p class="address-display">46 Dimock Camp Road, Springville, PA 18844</p>
+            <p class="mb-0 text-muted">
+              A half mile west of Rt. 29 in Dimock, about 15 miles north of Tunkhannock and
+              about 7 miles south of Montrose. There is a great Pavilion on the grounds and a
+              pond. We welcome churches and others to use our facilities.
+            </p>
+          </div>
+          <div class="col-12 col-lg-5 text-lg-end">
+            <a class="btn-pine me-2 mb-2" href="visit.html">Directions</a>
+            <a class="btn-pine-outline mb-2" href="contact.html">Contact us</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <footer class="site-footer">
       <div class="container container-narrow">

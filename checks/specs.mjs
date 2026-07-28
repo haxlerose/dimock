@@ -522,9 +522,19 @@ export const specs = [
         }, selector);
 
       if (ctx.name === "index") {
-        const heritage = await centered(".heritage-band p");
-        if (heritage === null) return "found no paragraphs in .heritage-band";
-        return heritage ? "the heritage paragraph is still centred" : null;
+        // Phase 5 removed the .heritage-band this used to name. The rule it was
+        // enforcing is not about that one block: nothing on the homepage that
+        // runs longer than a couple of lines should be centred, wherever it sits.
+        const long = await page.evaluate(() =>
+          Array.from(document.querySelectorAll("p"))
+            .filter((el) => el.textContent.trim().length > 200)
+            .filter((el) => el.getClientRects().length > 0)
+            .filter((el) => getComputedStyle(el).textAlign === "center")
+            .map((el) => el.textContent.trim().replace(/\s+/g, " ").slice(0, 40))
+        );
+        return long.length === 0
+          ? null
+          : `${long.length} long paragraph(s) still centred, first: "${long[0]}"`;
       }
 
       const prayer = await centered("#prayer-tab-pane p");
@@ -666,6 +676,119 @@ export const specs = [
         return "clicking the toggler again did not close the menu";
       }
       return (await menu.isVisible()) ? "the menu closed but is still visible" : null;
+    },
+  },
+  {
+    id: "homepage-links-site-css",
+    pages: ["index"],
+    check: async (page) => {
+      const local = await page.evaluate(() =>
+        Array.from(document.querySelectorAll('link[rel~="stylesheet"]'))
+          .map((el) => el.getAttribute("href"))
+          .filter((href) => href && !/^https?:/i.test(href))
+      );
+      if (!local.includes("site.css")) return "the homepage does not link site.css";
+      const extra = local.filter((href) => href !== "site.css");
+      return extra.length === 0
+        ? null
+        : `the homepage also links ${extra.join(", ")}; site.css is the only local stylesheet`;
+    },
+  },
+  {
+    id: "hero-alt-is-decorative",
+    pages: ["index"],
+    check: async (page) => {
+      const alt = await page.evaluate(() => {
+        const img = document.querySelector(".hero img");
+        return img ? { value: img.getAttribute("alt") } : null;
+      });
+      if (alt === null) return "no image inside .hero";
+      if (alt.value === null) return "the hero image has no alt attribute at all";
+      return alt.value.trim() === ""
+        ? null
+        : `the hero image is alt="${alt.value}"; the <h1> beside it carries the meaning, so the photograph is decorative and takes alt=""`;
+    },
+  },
+  {
+    id: "next-service-fallback-truthful",
+    pages: ["index"],
+    check: async (page, ctx) => {
+      // The band is upgraded by script in a later phase. What has to hold for
+      // ever is the sentence a visitor sees when that script never runs: it is
+      // the only claim on the page that could silently go stale, so it is read
+      // from a browser with JavaScript switched off.
+      const context = await page.context().browser().newContext({
+        javaScriptEnabled: false,
+        viewport: { width: ctx.viewport.width, height: ctx.viewport.height },
+      });
+      try {
+        const plain = await context.newPage();
+        await plain.goto(`${ctx.BASE_URL}/index.html`, { waitUntil: "domcontentloaded" });
+        const band = plain.locator("#next-service");
+        if ((await band.count()) === 0) return "no #next-service band on the homepage";
+
+        const text = (await band.innerText()).replace(/\s+/g, " ").trim();
+        if (!/Sunday evening services at 6:00 ?pm/i.test(text)) {
+          return `without JavaScript the band reads "${text}", expected the standing "Sunday evening services at 6:00 pm"`;
+        }
+        // A specific date in the fallback is a date nobody will update.
+        const dated = text.match(
+          /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b|\b\d{1,2}\/\d{1,2}\b|\b20\d{2}\b/i
+        );
+        return dated
+          ? `the no-JavaScript band names "${dated[0]}" — the fallback has to read true on any date, so it must not carry one`
+          : null;
+      } finally {
+        await context.close();
+      }
+    },
+  },
+  {
+    id: "images-lazy-with-dimensions",
+    pages: ["index"],
+    check: async (page) => {
+      // The hero is the one image above the fold; lazy-loading it would delay
+      // the thing the visitor came to look at.
+      const incomplete = await page.evaluate(() =>
+        Array.from(document.querySelectorAll("img"))
+          .filter((img) => !img.closest(".hero"))
+          .map((img) => ({
+            src: img.getAttribute("src"),
+            missing: [
+              img.getAttribute("loading") === "lazy" ? null : 'loading="lazy"',
+              img.getAttribute("width") ? null : "width",
+              img.getAttribute("height") ? null : "height",
+            ].filter(Boolean),
+          }))
+          .filter((entry) => entry.missing.length > 0)
+      );
+      return incomplete.length === 0
+        ? null
+        : `${incomplete.length} non-hero image(s) incomplete, first: ${incomplete[0].src} is missing ${incomplete[0].missing.join(", ")}`;
+    },
+  },
+  {
+    id: "heading-order-intact",
+    pages: ["index"],
+    check: async (page) => {
+      const headings = await page.evaluate(() =>
+        Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+          .filter((el) => el.getClientRects().length > 0)
+          .map((el) => ({
+            level: Number(el.tagName.slice(1)),
+            text: el.textContent.trim().replace(/\s+/g, " ").slice(0, 30),
+          }))
+      );
+      if (headings.length === 0) return "the page has no headings";
+      if (headings[0].level !== 1) {
+        return `the first heading is <h${headings[0].level}> "${headings[0].text}", expected <h1>`;
+      }
+      for (let i = 1; i < headings.length; i += 1) {
+        if (headings[i].level > headings[i - 1].level + 1) {
+          return `<h${headings[i - 1].level}> "${headings[i - 1].text}" is followed by <h${headings[i].level}> "${headings[i].text}" — a skipped level`;
+        }
+      }
+      return null;
     },
   },
   {
