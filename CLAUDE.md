@@ -69,6 +69,19 @@ browser), `specs.mjs` (the rules — **the only file that grows each phase**),
 rule means editing `specs.mjs` only. Screenshots land in `docs/screens/`, which is
 gitignored.
 
+`no-console-errors` ignores errors thrown by `maps.gstatic.com`,
+`maps.googleapis.com`, and `www.google.com` — the Google Maps embed on
+`visit.html` throws inside its own scripts about one load in ten and reports it
+into the host page's console. Nothing in this repository can prevent it. Google
+Fonts is deliberately **not** exempt, so a font that fails to load still fails
+the run.
+
+A spec may declare `clock: "2026-08-09T18:00:00"`. The runner then gives it a page of
+its own with `Date` frozen to that moment — installed before the document's own
+scripts run, which is why it cannot share the page the other specs use. The stub
+leaves the multi-argument constructor alone, so `new Date(y, m - 1, d)` still yields
+local midnight, which is what `schedule.js` relies on.
+
 ## Stack
 
 - **Bootstrap 5.3.1** via CDN, with SRI `integrity` hashes — keep them
@@ -76,7 +89,8 @@ gitignored.
   `<link>` tags sit between the Bootstrap stylesheet and `site.css`, identically on
   all six pages
 - **`site.css`** — the shared stylesheet, linked by all six pages
-- No JS framework — Bootstrap bundle JS only
+- No JS framework — the Bootstrap bundle plus `schedule.js`, which is the site's only
+  hand-written script and is loaded `defer` on `index.html` and `events.html`
 - **No build step.** No bundler, no Sass, no package manager, no CMS. Every
   deployed file exists in the repo, and pages stay hand-editable by a non-developer.
 - The host runs PHP (`viewlogs.php`), so server-side form handling is possible
@@ -102,7 +116,7 @@ restructured; Phase 9 deletes both prototype files.
 | `index-prototype.html` | First-draft editorial homepage, reference only — not linked, not deployed. |
 | `about.html` | Tabbed: history + landmark designation; many modals |
 | `services.html` | Tabbed: camp meeting / rekindling / prayer; modals |
-| `events.html` | Season schedule — one card per event |
+| `events.html` | Season schedule — one card per event, and the source of truth for the whole site's schedule |
 | `visit.html` | Tabbed: directions + attractions + cottages; carousel modals |
 | `contact.html` | Hero + contact card |
 
@@ -220,11 +234,13 @@ the text shadowed and vertically centered. Phase 8 moves it onto
 
 `.next-service` is the pine-deep strip under the homepage hero. **Its markup is
 the no-JavaScript fallback and must read true on any date** — "Sunday evening
-services at 6:00 pm" always is. The `data-ns="eyebrow|headline|meta"` slots are
-where Phase 6's `schedule.js` will write a real date; anything that writes them
-must leave the fallback alone when it has nothing better to say, including
-off-season. `next-service-fallback-truthful` loads the page in a browser with
-JavaScript switched off and fails if the band names a month or a year.
+services at 6:00 pm" always is. `schedule.js` writes the real next service into
+the `data-ns="eyebrow|headline|meta"` slots; anything that writes them must leave
+the fallback alone when it has nothing better to say, including off-season.
+`next-service-fallback-truthful` loads the page in a browser with JavaScript
+switched off and fails if the band names a month or a year, and
+`homepage-band-off-season` pins the clock to December and fails if the script
+reaches for a service that has already happened.
 
 There is deliberately **no inline `SCHEDULE` array** — the prototype had one and
 it duplicates `events.html`, which is the thing the owner rejected.
@@ -264,7 +280,8 @@ Each event is a flat block — a thin colored left rule, the day and date in Fra
 the title as an `<h2>`, the description in Inter. No card, no header fill.
 
 ```html
-<article class="event-card event-card-sunday mb-4">
+<article class="event-card event-card-sunday mb-4"
+         data-event-date="2026-08-02" data-event-title="Event Title">
   <p class="event-day">Sun &middot; <span class="no-break">Aug 2</span></p>
   <h2 class="event-title">Event Title</h2>
   <p class="event-body">Description</p>
@@ -274,6 +291,34 @@ the title as an `<h2>`, the description in Inter. No card, no header fill.
 `event-card-sunday` tints the rule and day pine, `event-card-saturday` ochre — but the
 day is always spelled out, so stripping every color from the page loses nothing. The
 `day-conveyed-in-text` spec enforces that.
+
+## The schedule — `events.html` is the source of truth
+
+The nine cards on `events.html` are the only place the season is written down.
+Each carries `data-event-date="YYYY-MM-DD"` and `data-event-title`, which are a
+machine-readable second copy of what the card already says in words;
+`event-cards-have-dates` fails if the two drift apart. **Edit the cards, not the
+script** — descriptions carry quotation marks, `<cite>` tags, and links, which is
+exactly why they are not JavaScript string literals.
+
+`schedule.js` (loaded `defer` on `index.html` and `events.html`, the same file on
+both) does two things and gates nothing:
+
+- On `events.html` it wraps the cards in a `<div class="schedule"
+  data-schedule="events">`, sorts them, and inserts `<h2 class="schedule-group">`
+  headings — "Upcoming" and "Earlier this season". Each heading appears only when
+  it has cards under it. Past cards get `.is-past` and are **dimmed to `--muted`,
+  never hidden**; the first upcoming card gets `.is-next` and a `.event-flag`
+  reading "Next service", because the marker must be words and not a tint.
+- On `index.html` it fetches `events.html`, parses it with `DOMParser`, and writes
+  the next service into the band. On any failure it returns without touching the
+  DOM, leaving the true fallback in place.
+
+Three traps, each already paid for: `fetch()` cannot read a `file://` page (review
+through `checks/run.sh`, not by opening the file); `Date.parse` on an ISO string is
+UTC and rolls the date backward in US timezones, so dates are built with
+`new Date(y, m - 1, d)`; and an event stays upcoming through the end of its own
+day, so tonight's service does not vanish at midnight this morning.
 
 ## Tab pattern (about, services, visit)
 

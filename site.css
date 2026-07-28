@@ -776,6 +776,47 @@ img {
   max-width: var(--measure);
 }
 
+/* schedule.js splits the events page into what is still to come and what has
+   already happened. Both labels are real headings, so the split survives with
+   the stylesheet stripped away as well as with the colour stripped away. */
+.section .schedule-group {
+  border-top: 1px solid var(--rule);
+  color: var(--ochre-ink);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  margin: 3.5rem 0 1.75rem;
+  padding-top: 1.35rem;
+  text-transform: uppercase;
+}
+
+.section .schedule-group:first-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.event-flag {
+  color: var(--ochre-ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+/* A service that has happened is dimmed, never removed — somebody looking up
+   a speaker they heard in July has to be able to find them. --muted clears
+   4.5:1 on cream, so the whole card stays readable rather than decorative. */
+.event-card.is-past {
+  border-left-color: var(--rule);
+}
+
+.event-card.is-past .event-day,
+.event-card.is-past .event-title,
+.event-card.is-past .event-body {
+  color: var(--muted);
+}
+
 .address-callout {
   background: var(--paper);
   border: 1px solid var(--rule);

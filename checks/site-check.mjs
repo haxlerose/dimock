@@ -3,6 +3,58 @@ import { specs, PAGES } from "./specs.mjs";
 
 const { chromium } = createRequire(import.meta.url)(process.env.PW_MODULE);
 
+/**
+ * Freezes the clock a page sees, installed before any of the document's own
+ * script runs. The multi-argument constructor is deliberately left alone:
+ * schedule.js builds `new Date(y, m - 1, d)` to get local midnight, and
+ * stubbing that away would test something the site never does.
+ */
+export const stubClock = (page, iso) =>
+  page.addInitScript((frozen) => {
+    const RealDate = Date;
+    const fixed = new RealDate(frozen).getTime();
+    class StubDate extends RealDate {
+      constructor(...args) {
+        if (args.length === 0) super(fixed);
+        else super(...args);
+      }
+      static now() {
+        return fixed;
+      }
+    }
+    window.Date = StubDate;
+  }, iso);
+
+/**
+ * The Google Maps embed on visit.html intermittently throws inside its own
+ * scripts — "google is not defined" out of maps.gstatic.com, roughly one load
+ * in ten — and reports it into the host page's console. It is not thrown by any
+ * file in this repository and no change to the site can prevent it, which is
+ * the same reason visible-focus-ring exempts the map iframe. Only these three
+ * hosts are excused; Google Fonts is deliberately not among them, so a font
+ * that fails to load is still a failure.
+ */
+const EMBED_HOSTS = ["maps.gstatic.com", "maps.googleapis.com", "www.google.com"];
+
+const isOurError = (message) => {
+  if (message.type() !== "error") return false;
+  const url = message.location()?.url ?? "";
+  if (!url) return true;
+  try {
+    return !EMBED_HOSTS.includes(new URL(url).hostname);
+  } catch {
+    return true;
+  }
+};
+
+/** Records this page's own errors into `sink`, ignoring the map embed's. */
+const watchConsole = (page, sink) => {
+  page.on("pageerror", (error) => sink.push(String(error)));
+  page.on("console", (message) => {
+    if (isOurError(message)) sink.push(message.text());
+  });
+};
+
 const BASE_URL = process.env.BASE_URL ?? "http://127.0.0.1:8811";
 const WANT_SHOTS = process.argv.includes("--shots");
 const VIEWPORTS = [
@@ -23,10 +75,7 @@ for (const viewport of VIEWPORTS) {
   for (const name of PAGES) {
     const page = await context.newPage();
     const consoleErrors = [];
-    page.on("pageerror", (error) => consoleErrors.push(String(error)));
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text());
-    });
+    watchConsole(page, consoleErrors);
 
     await page.goto(`${BASE_URL}/${name}.html`, { waitUntil: "networkidle" });
 
@@ -39,12 +88,30 @@ for (const viewport of VIEWPORTS) {
 
     for (const spec of specs) {
       if (!spec.pages.includes(name)) continue;
+
+      // A spec that pins the clock gets a page of its own. The stub has to be
+      // in place before the document's scripts run, so it cannot be bolted on
+      // to the page every other spec is already sharing.
+      let target = page;
+      let errors = consoleErrors;
+      let scoped = null;
+      if (spec.clock) {
+        scoped = await context.newPage();
+        errors = [];
+        watchConsole(scoped, errors);
+        await stubClock(scoped, spec.clock);
+        await scoped.goto(`${BASE_URL}/${name}.html`, { waitUntil: "networkidle" });
+        target = scoped;
+      }
+
       let detail;
       try {
-        detail = await spec.check(page, { consoleErrors, name, viewport, BASE_URL });
+        detail = await spec.check(target, { consoleErrors: errors, name, viewport, BASE_URL });
       } catch (error) {
         detail = `threw: ${error.message}`;
       }
+      if (scoped) await scoped.close();
+
       if (detail) failures.push({ spec: spec.id, page: name, viewport: viewport.name, detail });
       else passed += 1;
     }

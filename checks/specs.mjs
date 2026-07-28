@@ -8,6 +8,22 @@ const BOOTSTRAP_RED = "rgb(220, 53, 69)";
 const PINE = "rgb(44, 87, 65)";
 const PINE_DEEP = "rgb(31, 64, 48)";
 const OCHRE_INK = "rgb(138, 86, 24)";
+const MUTED = "rgb(106, 111, 100)";
+
+// The 2026 season as events.html publishes it. Held here so a spec can assert
+// the machine-readable dates against something other than the same attributes
+// it is checking.
+const SEASON_2026 = [
+  ["2026-07-11", "Sat", "Jul 11", "All That Glitters"],
+  ["2026-07-18", "Sat", "Jul 18", "The Sisterhood Music"],
+  ["2026-07-25", "Sat", "Jul 25", "The Frost Duo"],
+  ["2026-08-02", "Sun", "Aug 2", "Cedar Routes"],
+  ["2026-08-09", "Sun", "Aug 9", "Rick Marsi"],
+  ["2026-08-16", "Sun", "Aug 16", "Paul and Hannah Chesterton"],
+  ["2026-08-23", "Sun", "Aug 23", "Lisa Whitaker"],
+  ["2026-08-30", "Sun", "Aug 30", "Patti Yoder"],
+  ["2026-09-06", "Sun", "Sep 6", "Communion Service"],
+];
 
 // Text sitting over a photograph has no computable background. The hero is the
 // only such place on the site; its type is white on a dark scrim with a text
@@ -86,6 +102,66 @@ const collectTextStyles = (skipSelectors) => {
 
   return results;
 };
+
+/**
+ * Runs in the browser. Reports the events page as script has left it: the group
+ * headings in document order, the dates filed under each, and which card is
+ * flagged as the next service.
+ */
+const collectSchedule = () => {
+  const root = document.querySelector('[data-schedule="events"]');
+  if (!root) return { error: 'no [data-schedule="events"] wrapper on the page' };
+
+  const dateOf = (card) => card.getAttribute("data-event-date");
+  const groups = [];
+  const ungrouped = [];
+  let current = null;
+
+  for (const child of Array.from(root.children)) {
+    if (child.classList.contains("schedule-group")) {
+      current = { heading: child.textContent.replace(/\s+/g, " ").trim(), dates: [] };
+      groups.push(current);
+    } else if (child.classList.contains("event-card")) {
+      (current ? current.dates : ungrouped).push(dateOf(child));
+    }
+  }
+
+  const cards = Array.from(root.querySelectorAll(".event-card"));
+  const next = root.querySelector(".event-card.is-next");
+  return {
+    groups,
+    ungrouped,
+    order: cards.map(dateOf),
+    past: cards.filter((card) => card.classList.contains("is-past")).map(dateOf),
+    hidden: cards.filter((card) => card.getClientRects().length === 0).map(dateOf),
+    next: next ? dateOf(next) : null,
+    nextText: next ? next.textContent.replace(/\s+/g, " ").trim() : "",
+    nextIsPast: next ? next.classList.contains("is-past") : false,
+    flagged: cards.filter((card) => card.classList.contains("is-next")).length,
+  };
+};
+
+/**
+ * Loads a page in a browser with JavaScript switched off. Every claim the site
+ * makes has to survive this — script sharpens the schedule, it never carries it.
+ */
+const withoutJavaScript = async (page, ctx, name, read) => {
+  const context = await page.context().browser().newContext({
+    javaScriptEnabled: false,
+    viewport: { width: ctx.viewport.width, height: ctx.viewport.height },
+  });
+  try {
+    const plain = await context.newPage();
+    await plain.goto(`${ctx.BASE_URL}/${name}.html`, { waitUntil: "domcontentloaded" });
+    return await read(plain);
+  } finally {
+    await context.close();
+  }
+};
+
+const STANDING_SENTENCE = /Sunday evening services at 6:00 ?pm/i;
+const A_DATE =
+  /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b|\b\d{1,2}\/\d{1,2}\b|\b20\d{2}\b/i;
 
 /** Scans every element for a computed colour anywhere in its box. */
 const collectPalette = () => {
@@ -280,6 +356,7 @@ export const specs = [
       const cards = await page.evaluate(() =>
         Array.from(document.querySelectorAll(".event-card")).map((card) => ({
           text: card.textContent.replace(/\s+/g, " ").trim(),
+          past: card.classList.contains("is-past"),
           dayTinted: getComputedStyle(
             card.querySelector(".event-day") ?? card
           ).color,
@@ -290,11 +367,16 @@ export const specs = [
       if (silent.length > 0) {
         return `${silent.length} event card(s) name no day in text, first: "${silent[0].text.slice(0, 40)}"`;
       }
-      const wanted = [PINE, OCHRE_INK];
-      const offPalette = cards.filter((card) => !wanted.includes(card.dayTinted));
+      // A service that has already happened drops its day tint along with the
+      // rest of the card. That is a deliberate second state, not a stray colour
+      // — and the day is still spelled out either way, which is the point.
+      const offPalette = cards.filter((card) => {
+        const wanted = card.past ? [MUTED] : [PINE, OCHRE_INK];
+        return !wanted.includes(card.dayTinted);
+      });
       return offPalette.length === 0
         ? null
-        : `an .event-day is ${offPalette[0].dayTinted}, expected one of ${wanted.join(" / ")}`;
+        : `an .event-day on a ${offPalette[0].past ? "past" : "upcoming"} card is ${offPalette[0].dayTinted}, expected ${(offPalette[0].past ? [MUTED] : [PINE, OCHRE_INK]).join(" / ")}`;
     },
   },
   {
@@ -713,34 +795,24 @@ export const specs = [
     id: "next-service-fallback-truthful",
     pages: ["index"],
     check: async (page, ctx) => {
-      // The band is upgraded by script in a later phase. What has to hold for
-      // ever is the sentence a visitor sees when that script never runs: it is
-      // the only claim on the page that could silently go stale, so it is read
-      // from a browser with JavaScript switched off.
-      const context = await page.context().browser().newContext({
-        javaScriptEnabled: false,
-        viewport: { width: ctx.viewport.width, height: ctx.viewport.height },
-      });
-      try {
-        const plain = await context.newPage();
-        await plain.goto(`${ctx.BASE_URL}/index.html`, { waitUntil: "domcontentloaded" });
+      // schedule.js sharpens this band when it can. What has to hold for ever
+      // is the sentence a visitor sees when that script never runs: it is the
+      // only claim on the page that could silently go stale, so it is read from
+      // a browser with JavaScript switched off.
+      return withoutJavaScript(page, ctx, "index", async (plain) => {
         const band = plain.locator("#next-service");
         if ((await band.count()) === 0) return "no #next-service band on the homepage";
 
         const text = (await band.innerText()).replace(/\s+/g, " ").trim();
-        if (!/Sunday evening services at 6:00 ?pm/i.test(text)) {
+        if (!STANDING_SENTENCE.test(text)) {
           return `without JavaScript the band reads "${text}", expected the standing "Sunday evening services at 6:00 pm"`;
         }
         // A specific date in the fallback is a date nobody will update.
-        const dated = text.match(
-          /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b|\b\d{1,2}\/\d{1,2}\b|\b20\d{2}\b/i
-        );
+        const dated = text.match(A_DATE);
         return dated
           ? `the no-JavaScript band names "${dated[0]}" — the fallback has to read true on any date, so it must not carry one`
           : null;
-      } finally {
-        await context.close();
-      }
+      });
     },
   },
   {
@@ -811,5 +883,230 @@ export const specs = [
         ? null
         : `the <h1> starts at ${Math.round(measured.headingTop)}px, beneath a nav ending at ${Math.round(measured.navBottom)}px`;
     },
+  },
+  {
+    id: "event-cards-have-dates",
+    pages: ["events"],
+    check: async (page) => {
+      const cards = await page.evaluate(() =>
+        Array.from(document.querySelectorAll(".event-card")).map((card) => ({
+          date: card.getAttribute("data-event-date"),
+          title: card.getAttribute("data-event-title"),
+          heading: (card.querySelector(".event-title")?.textContent ?? "")
+            .replace(/\s+/g, " ")
+            .trim(),
+          day: (card.querySelector(".event-day")?.textContent ?? "")
+            .replace(/\s+/g, " ")
+            .trim(),
+        }))
+      );
+      if (cards.length !== SEASON_2026.length) {
+        return `expected ${SEASON_2026.length} event cards, found ${cards.length}`;
+      }
+
+      // The attributes are a second, machine-readable copy of a date and a name
+      // the visitor already reads off the card. If the two ever drift apart the
+      // invisible one silently wins, so they are checked against each other.
+      const problems = [];
+      for (const [date, day, label, title] of SEASON_2026) {
+        const card = cards.find((entry) => entry.title === title);
+        if (!card) {
+          problems.push(`no card carries data-event-title="${title}"`);
+          continue;
+        }
+        if (card.date !== date) {
+          problems.push(`"${title}" is data-event-date="${card.date}", expected ${date}`);
+        }
+        if (card.heading !== title) {
+          problems.push(
+            `data-event-title="${title}" sits on a card headed "${card.heading}"`
+          );
+        }
+        if (!card.day.includes(day) || !card.day.includes(label)) {
+          problems.push(`"${title}" is dated ${date} but its card reads "${card.day}"`);
+        }
+      }
+      return problems.length === 0
+        ? null
+        : `${problems.length} problem(s), first: ${problems[0]}`;
+    },
+  },
+  {
+    id: "events-split-at-stubbed-date",
+    pages: ["events"],
+    clock: "2026-08-09T18:00:00",
+    check: async (page) => {
+      const schedule = await page.evaluate(collectSchedule);
+      if (schedule.error) return schedule.error;
+
+      const headings = schedule.groups.map((group) => group.heading);
+      if (headings.join(" | ") !== "Upcoming | Earlier this season") {
+        return `group headings are "${headings.join(" | ")}", expected "Upcoming | Earlier this season" in that order`;
+      }
+      if (schedule.ungrouped.length > 0) {
+        return `${schedule.ungrouped.length} card(s) sit above every heading, first ${schedule.ungrouped[0]}`;
+      }
+
+      const expected = {
+        Upcoming: ["2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06"],
+        "Earlier this season": ["2026-07-11", "2026-07-18", "2026-07-25", "2026-08-02"],
+      };
+      for (const group of schedule.groups) {
+        const want = expected[group.heading].join(", ");
+        const got = group.dates.join(", ");
+        if (want !== got) return `"${group.heading}" holds ${got}, expected ${want}`;
+      }
+
+      // Dimmed, never gone: someone looking for a speaker they heard in July
+      // still has to be able to find them.
+      if (schedule.hidden.length > 0) {
+        return `${schedule.hidden.length} event card(s) are not rendered at all, first ${schedule.hidden[0]}`;
+      }
+      if (schedule.past.join(", ") !== expected["Earlier this season"].join(", ")) {
+        return `.is-past is on ${schedule.past.join(", ")}, expected the four that have passed`;
+      }
+      if (schedule.flagged !== 1) {
+        return `${schedule.flagged} card(s) carry .is-next, expected exactly 1`;
+      }
+      if (schedule.next !== "2026-08-09") {
+        return `.is-next is on ${schedule.next}, expected 2026-08-09`;
+      }
+      return /next service/i.test(schedule.nextText)
+        ? null
+        : `the next service is marked only by styling — its card reads "${schedule.nextText.slice(0, 60)}" and never says so in text`;
+    },
+  },
+  {
+    id: "event-upcoming-until-end-of-day",
+    pages: ["events"],
+    // Eleven at night on the day of a service. It has not happened yet as far
+    // as the page is concerned, and it must not slide into the past because the
+    // clock has moved past midnight this morning.
+    clock: "2026-08-09T23:00:00",
+    check: async (page) => {
+      const schedule = await page.evaluate(collectSchedule);
+      if (schedule.error) return schedule.error;
+      if (schedule.next !== "2026-08-09") {
+        return `at 11pm on 2026-08-09 the next service is ${schedule.next}, expected that evening's own service`;
+      }
+      return schedule.past.includes("2026-08-09")
+        ? "the evening's own service is already filed under Earlier this season at 11pm"
+        : null;
+    },
+  },
+  {
+    id: "events-preseason-has-no-past-group",
+    pages: ["events"],
+    clock: "2026-07-01T12:00:00",
+    check: async (page) => {
+      const schedule = await page.evaluate(collectSchedule);
+      if (schedule.error) return schedule.error;
+      const headings = schedule.groups.map((group) => group.heading);
+      if (headings.includes("Earlier this season")) {
+        return "nothing has happened yet, and the page still offers an Earlier this season heading";
+      }
+      if (schedule.past.length > 0) {
+        return `${schedule.past.length} card(s) are dimmed before the season has started`;
+      }
+      return schedule.next === "2026-07-11"
+        ? null
+        : `.is-next is on ${schedule.next}, expected the opening service 2026-07-11`;
+    },
+  },
+  {
+    id: "events-postseason-has-no-upcoming-group",
+    pages: ["events"],
+    clock: "2026-12-01T12:00:00",
+    check: async (page) => {
+      const schedule = await page.evaluate(collectSchedule);
+      if (schedule.error) return schedule.error;
+      const headings = schedule.groups.map((group) => group.heading);
+      if (headings.includes("Upcoming")) {
+        return "the season is over, and the page still offers an Upcoming heading";
+      }
+      if (!headings.includes("Earlier this season")) {
+        return `expected an Earlier this season heading, found "${headings.join(" | ")}"`;
+      }
+      if (schedule.past.length !== SEASON_2026.length) {
+        return `${schedule.past.length} of ${SEASON_2026.length} card(s) are marked past after the season has ended`;
+      }
+      return schedule.flagged === 0
+        ? null
+        : "a service is still flagged as next after the season has ended";
+    },
+  },
+  {
+    id: "homepage-band-names-next-service",
+    pages: ["index"],
+    clock: "2026-08-09T18:00:00",
+    check: async (page) => {
+      const text = (await page.locator("#next-service").innerText())
+        .replace(/\s+/g, " ")
+        .trim();
+      const missing = ["Sunday, August 9", "Rick Marsi"].filter(
+        (needle) => !text.includes(needle)
+      );
+      return missing.length === 0
+        ? null
+        : `the band reads "${text}" and never names ${missing.join(" or ")}`;
+    },
+  },
+  {
+    id: "homepage-band-off-season",
+    pages: ["index"],
+    clock: "2026-12-01T12:00:00",
+    check: async (page) => {
+      const text = (await page.locator("#next-service").innerText())
+        .replace(/\s+/g, " ")
+        .trim();
+      // With nothing left to announce the band has to fall silent rather than
+      // reach for the last event of a season that finished in September.
+      if (!STANDING_SENTENCE.test(text)) {
+        return `off season the band reads "${text}", expected it to fall back to the standing "Sunday evening services at 6:00 pm"`;
+      }
+      const dated = text.match(A_DATE);
+      return dated
+        ? `off season the band still names "${dated[0]}"`
+        : null;
+    },
+  },
+  {
+    id: "schedule-works-without-js",
+    pages: ["index", "events"],
+    check: async (page, ctx) =>
+      withoutJavaScript(page, ctx, ctx.name, async (plain) => {
+        if (ctx.name === "index") {
+          const text = (await plain.locator("#next-service").innerText())
+            .replace(/\s+/g, " ")
+            .trim();
+          return STANDING_SENTENCE.test(text)
+            ? null
+            : `without JavaScript the homepage band reads "${text}"`;
+        }
+
+        const cards = await plain.evaluate(() =>
+          Array.from(document.querySelectorAll(".event-card")).map((card) => ({
+            date: card.getAttribute("data-event-date"),
+            visible: card.getClientRects().length > 0,
+            grouped: card.classList.contains("is-past") || card.classList.contains("is-next"),
+          }))
+        );
+        if (cards.length !== SEASON_2026.length) {
+          return `without JavaScript the page shows ${cards.length} of ${SEASON_2026.length} events`;
+        }
+        const invisible = cards.filter((card) => !card.visible);
+        if (invisible.length > 0) {
+          return `${invisible.length} event(s) are not rendered without JavaScript, first ${invisible[0].date}`;
+        }
+        const marked = cards.filter((card) => card.grouped);
+        if (marked.length > 0) {
+          return `${marked.length} card(s) are pre-marked past or next in the served markup — the split is the script's job`;
+        }
+        const order = cards.map((card) => card.date).join(", ");
+        const documentOrder = SEASON_2026.map(([date]) => date).join(", ");
+        return order === documentOrder
+          ? null
+          : `without JavaScript the events read ${order}, expected document order ${documentOrder}`;
+      }),
   },
 ];
