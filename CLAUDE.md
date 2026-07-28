@@ -48,10 +48,16 @@ checks/run.sh --shots    # same, plus screenshots into docs/screens/ for review
 
 `checks/` is a Playwright harness that serves the site on port 8811 and asserts, for
 every page at 1440×900 and 390×844: no console errors, exactly one `<h1>`, and zero
-horizontal overflow — plus whatever the current redesign phase has added (contrast
-ratios, nav and footer identity across pages, per-page metadata). Run it before every
+horizontal overflow — plus contrast ratios, nav and footer identity across pages,
+per-page metadata, heading order, anchored sections, the schedule's self-consistency,
+and the image budget. **476 assertions, all green as of Phase 9.** Run it before every
 commit that touches HTML or CSS. A passing run is necessary but not sufficient —
 `--shots` exists to be looked at.
+
+A few specs are repository-wide rather than per-page — the image budget is the obvious
+one — and those are pinned to a single page and the desktop viewport so they are
+reported once rather than twelve times. `specs.mjs` reads the filesystem directly for
+those, from the repository root.
 
 **`checks/` is never deployed.** `.claude/commands/deploy.md` excludes it alongside
 `backup/`.
@@ -100,22 +106,21 @@ the function form so that no clock names a date from a particular season.
 
 ## Stylesheets
 
-| File | Scope |
-|------|-------|
-| `site.css` | The live shared stylesheet, linked by all six pages. Pine/ochre/cream tokens, Fraunces + Inter typography, the shared shell, and the whole component vocabulary. |
-| `prototype.css` | Reference only, **`redesign` branch only** — linked by `index-prototype.html`, not by any live page. `site.css` has now adopted everything it is going to: the components in Phase 4 and the homepage layout in Phase 5. Nothing here is still pending a port; Phase 9 deletes it. |
+`site.css` is the only stylesheet. All six pages link it, and it holds the
+pine/ochre/cream tokens, Fraunces + Inter typography, the shared shell, and the whole
+component vocabulary. Pages carry no inline `<style>` block.
 
-`prototype.css` is scaffolding, not a second live stylesheet: only
-`index-prototype.html` links it, and nothing links to that page. The new system lands
-in `site.css` across all six pages (Phases 1–4) before any single page is
-restructured; Phase 9 deletes both prototype files.
+`prototype.css` and `index-prototype.html` were the scaffolding the new system was
+drafted in. `site.css` adopted the components in Phase 4 and the homepage layout in
+Phase 5, and Phase 9 deleted both files. Nothing links to them because they no longer
+exist — **do not recreate them.** A second stylesheet nobody deploys is a file the next
+editor will change by mistake.
 
 ## Pages
 
 | File | Content |
 |------|---------|
 | `index.html` | Editorial hero, next-service band, mission/vision, photography, heritage + milestones, address strip. Rebuilt in Phase 5. |
-| `index-prototype.html` | First-draft editorial homepage, reference only — not linked, not deployed. |
 | `about.html` | Anchored sections: history + landmark designation; a few modals. Rebuilt in Phase 7. |
 | `services.html` | Anchored sections: camp meeting / rekindling / prayer; one modal. Rebuilt in Phase 7. |
 | `events.html` | Season schedule — one card per event, and the source of truth for the whole site's schedule |
@@ -418,6 +423,43 @@ images onto the page, so what is left is `#wyalusing`, `#ira-walker`, and `#stoc
 `about.html` and `#poster` on `services.html` — three digressions and two documents you
 need to zoom in to read. `history-images-inline` fails if one of those pictures goes
 back to being reachable only through a trigger.
+
+## Images
+
+Landed in Phase 9. **The budget is 450 KB an image and 4.5 MB the whole site**, enforced
+by `image-weight-budget`. The site sits at about 4.05 MB, down from 5.77 MB.
+
+That budget is not the 250 KB / 2 MB the redesign plan first asked for, and the reason
+is worth keeping so nobody re-tightens it and then discovers this the hard way:
+
+- **`sips` is the only encoder available.** No package manager, and macOS 12 cannot
+  write WebP — `sips -s format webp` reports success and produces no file.
+- **Its quality scale runs high.** Quality 80 takes about 16% off these photographs, not
+  the 70% the plan assumed. Quality **65** is the working setting and the floor before
+  artifacts show; it was checked against the originals at 1:1 before being accepted.
+- **Twelve of the images are already compressed past what `sips` can improve** —
+  re-encoding them produces a *larger* file. `chapel.jpg`, `poster.jpg`, `lewislodge.jpg`,
+  `train.jpg`, `sunset.jpg`, `bears1.jpg`, and all six `kevin_cottage_*.jpg` keep their
+  originals on purpose. Before re-encoding anything, check the output is actually smaller.
+- **`sips -Z` upscales.** It resizes to fit the given box in *both* directions, so running
+  it over the whole folder inflates every small image. Only downscale files that exceed
+  the target.
+
+`chapel.jpg` is 1000×672 and is upscaled by the hero on any desktop screen. There is no
+higher-resolution original — confirmed by the owner 2026-07-28 — so this is accepted, not
+a bug to fix. Do not sharpen it to compensate.
+
+`no-oversized-images` fails an image served at more than 2× the width it is displayed at,
+measured at the desktop viewport. `poster.jpg` and `stock.jpg` are exempt: they are
+documents rather than photographs, and resolution is the point of them.
+
+**Every `<img>` needs `alt`, `loading="lazy"`, `width`, and `height`.** The one exemption
+is the hero image, which is decorative (`alt=""`) and must not be lazy. `alt=""` is a
+decision that marks an image decorative; `all-images-have-alt` fails on a missing
+attribute, on placeholder text, and on an alt that is just the filename. It was written
+to catch the fifteen carousel photographs that shipped through Phase 8 reading
+`alt="..."`. The width and height attributes must match the file — resizing an image
+means updating them wherever it appears, or the page shifts as it loads.
 
 ## Working rules
 

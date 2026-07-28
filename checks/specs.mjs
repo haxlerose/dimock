@@ -1,3 +1,5 @@
+import { readdirSync, statSync } from "node:fs";
+
 import { contrastRatio } from "./contrast.mjs";
 
 export const PAGES = ["index", "about", "services", "events", "visit", "contact"];
@@ -383,6 +385,40 @@ const bannedColor = (banned, label) => async (page) => {
   const first = hits[0];
   return `${hits.length} element(s) still render ${label}, first: ${first.element} { ${first.property}: ${first.value} }`;
 };
+
+// The image budget is 450 KB an image and 4.5 MB the site — not the 250 KB and
+// 2 MB the redesign plan first guessed at. That guess assumed re-encoding would
+// cut these JPEGs by 70%; measured, it cuts them by 31%. `sips` is the only
+// encoder available (macOS 12 cannot write WebP, and the site takes no package
+// manager), its quality scale runs high enough that 65 is the floor before
+// artifacts show, and twelve of the images are already compressed past what it
+// can improve. The budget describes the site that can actually be built.
+const IMAGE_BUDGET_BYTES = 4.5 * 1024 * 1024;
+const IMAGE_MAX_BYTES = 450 * 1024;
+
+// Two images are documents rather than photographs — the 1936 handbill and the
+// 1877 share certificate — and they sit in a modal precisely so they can be
+// zoomed into and read. Resolution is the point of them, so the 2× rule does
+// not apply. This is the same kind of exemption the map iframe gets.
+const ZOOMABLE_DOCUMENTS = ["poster.jpg", "stock.jpg"];
+
+// Bootstrap's `modal-xl` caps its dialog here, which is the width an image
+// inside a closed modal will get when it opens.
+const MODAL_XL_WIDTH = 1140;
+
+const IMAGE_FILE = /\.(?:jpe?g|png|gif|webp|avif|svg)$/i;
+
+const kb = (bytes) => `${Math.round(bytes / 1024)} KB`;
+
+/**
+ * Every image that ships. The runner works from the repository root, and the
+ * deployed site is the root — `backup/`, `docs/`, and `checks/` are all
+ * excluded from deployment, so nothing inside them counts against the budget.
+ */
+const deployedImages = () =>
+  readdirSync(".", { withFileTypes: true })
+    .filter((entry) => entry.isFile() && IMAGE_FILE.test(entry.name))
+    .map((entry) => ({ name: entry.name, bytes: statSync(entry.name).size }));
 
 export const specs = [
   {
@@ -1612,6 +1648,152 @@ export const specs = [
       return eager.length === 0
         ? null
         : `${eager.length} iframe(s) are not loading="lazy", first: ${eager[0].src}…`;
+    },
+  },
+  {
+    id: "image-weight-budget",
+    pages: ["index"],
+    check: async (page, ctx) => {
+      // A fact about the repository, not about this page or this viewport.
+      // Pinned to one page and one viewport so it is reported once.
+      if (ctx.viewport.name !== "desktop") return null;
+
+      const images = deployedImages();
+      if (images.length === 0) return "no images found — has the check lost its footing?";
+
+      const heavy = images
+        .filter((image) => image.bytes > IMAGE_MAX_BYTES)
+        .sort((a, b) => b.bytes - a.bytes);
+      if (heavy.length > 0) {
+        const named = heavy.map((image) => `${image.name} ${kb(image.bytes)}`).join(", ");
+        return `${heavy.length} image(s) over ${kb(IMAGE_MAX_BYTES)}: ${named}`;
+      }
+
+      const total = images.reduce((sum, image) => sum + image.bytes, 0);
+      return total <= IMAGE_BUDGET_BYTES
+        ? null
+        : `images total ${kb(total)}, over the ${kb(IMAGE_BUDGET_BYTES)} budget`;
+    },
+  },
+  {
+    id: "no-oversized-images",
+    pages: ALL,
+    check: async (page, ctx) => {
+      // The rule is about the *widest* an image is ever displayed, and that is
+      // the desktop viewport. Measuring at 390 would condemn every image here.
+      if (ctx.viewport.name !== "desktop") return null;
+
+      const oversized = await page.evaluate(
+        ({ exempt, modalWidth }) =>
+          Array.from(document.querySelectorAll("img"))
+            .map((img) => {
+              const file = (img.getAttribute("src") ?? "").split("/").pop();
+              if (exempt.includes(file)) return null;
+
+              // A lazy image inside a closed modal has never decoded, so
+              // naturalWidth is 0. Its declared width attribute is the honest
+              // stand-in — the markup is required to carry one regardless.
+              const natural =
+                img.naturalWidth || Number(img.getAttribute("width")) || 0;
+              if (!natural) return null;
+
+              // That same closed modal gives the image no box yet. It will get
+              // the width the modal hands it once opened.
+              const shown = Math.max(img.getBoundingClientRect().width, modalWidth);
+              return natural > shown * 2
+                ? { file, natural, shown: Math.round(shown) }
+                : null;
+            })
+            .filter(Boolean),
+        { exempt: ZOOMABLE_DOCUMENTS, modalWidth: MODAL_XL_WIDTH }
+      );
+
+      if (oversized.length === 0) return null;
+      const first = oversized[0];
+      return `${oversized.length} image(s) served over 2× their displayed width, first: ${first.file} is ${first.natural}px for a ${first.shown}px slot`;
+    },
+  },
+  {
+    id: "all-images-have-alt",
+    pages: ALL,
+    check: async (page) => {
+      // Three different failures, because the first version of this spec only
+      // asked whether the attribute existed and passed a page whose fifteen
+      // carousel photographs all read alt="...".
+      //
+      // `alt=""` is not one of them: an empty alt is a decision that marks the
+      // image decorative, and it is what the hero photograph is meant to carry.
+      const faults = await page.evaluate(() => {
+        const PLACEHOLDERS = ["image", "photo", "photograph", "picture", "img", "alt"];
+        return Array.from(document.querySelectorAll("img"))
+          .map((img) => {
+            const file = (img.getAttribute("src") ?? "?").split("/").pop();
+            const alt = img.getAttribute("alt");
+            if (alt === null) return `${file} has no alt attribute`;
+            const trimmed = alt.trim();
+            if (trimmed === "") return null;
+            if (!/[A-Za-z]/.test(trimmed)) {
+              return `${file} has a placeholder alt (${JSON.stringify(alt)})`;
+            }
+            const bare = trimmed.toLowerCase().replace(/[^a-z]/g, "");
+            if (PLACEHOLDERS.includes(bare)) {
+              return `${file} has a placeholder alt (${JSON.stringify(alt)})`;
+            }
+            if (bare === file.toLowerCase().replace(/[^a-z]/g, "")) {
+              return `${file} is described by its own filename`;
+            }
+            return null;
+          })
+          .filter(Boolean);
+      });
+      return faults.length === 0
+        ? null
+        : `${faults.length} image(s) not described: ${faults.join("; ")}`;
+    },
+  },
+  {
+    id: "no-broken-references",
+    pages: ALL,
+    check: async (page, ctx) => {
+      // The markup is identical at both viewports; checking twice would only
+      // double the requests.
+      if (ctx.viewport.name !== "desktop") return null;
+
+      const refs = await page.evaluate(() => {
+        const found = new Set();
+        const collect = (selector, attribute) => {
+          document.querySelectorAll(selector).forEach((el) => {
+            const value = el.getAttribute(attribute);
+            if (!value) return;
+            // Off-site, in-page, and non-fetchable schemes are somebody
+            // else's problem — this spec is about files that should be here.
+            if (/^(https?:|mailto:|tel:|data:|#)/i.test(value)) return;
+            const path = value.split("#")[0].split("?")[0];
+            if (path) found.add(path);
+          });
+        };
+        collect("img", "src");
+        collect("link[href]", "href");
+        collect("script[src]", "src");
+        collect("a[href]", "href");
+        collect("iframe[src]", "src");
+        return Array.from(found);
+      });
+
+      const broken = [];
+      for (const ref of refs) {
+        try {
+          const response = await fetch(new URL(ref, `${ctx.BASE_URL}/`), {
+            method: "HEAD",
+          });
+          if (!response.ok) broken.push(`${ref} → ${response.status}`);
+        } catch (error) {
+          broken.push(`${ref} → ${error.message}`);
+        }
+      }
+      return broken.length === 0
+        ? null
+        : `${broken.length} dead reference(s): ${broken.join(", ")}`;
     },
   },
 ];
