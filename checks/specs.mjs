@@ -736,6 +736,65 @@ export const specs = [
     },
   },
   {
+    id: "canonical-and-og-url-absolute",
+    pages: ALL,
+    check: async (page, ctx) => {
+      // Social scrapers and search engines resolve these against nothing — a
+      // relative og:image is why link previews to this site rendered bare. The
+      // scheme is deliberately not hard-coded here: the site is http:// until
+      // the certificate is fixed, and this spec only asks that every page
+      // agrees with the homepage, so the switch needs no edit to checks/.
+      const found = await page.evaluate(() => {
+        const links = Array.from(document.querySelectorAll('link[rel="canonical"]'));
+        const meta = (property) =>
+          document.querySelector(`meta[property="${property}"]`)?.content ?? null;
+        return {
+          canonicalCount: links.length,
+          canonical: links[0]?.getAttribute("href") ?? null,
+          ogUrl: meta("og:url"),
+          ogImage: meta("og:image"),
+        };
+      });
+
+      if (found.canonicalCount !== 1) {
+        return `expected exactly 1 <link rel="canonical">, found ${found.canonicalCount}`;
+      }
+      for (const [label, value] of [
+        ["canonical", found.canonical],
+        ["og:url", found.ogUrl],
+        ["og:image", found.ogImage],
+      ]) {
+        if (!value) return `${label} is missing`;
+        if (!/^https?:\/\/[^/]+\//.test(value)) {
+          return `${label} is not an absolute URL: "${value}"`;
+        }
+      }
+      if (found.ogUrl !== found.canonical) {
+        return `og:url "${found.ogUrl}" does not match canonical "${found.canonical}"`;
+      }
+
+      // The path has to name this page, or every page canonicalises to one URL
+      // and five of them vanish from the index.
+      const expectedPath = ctx.name === "index" ? "/" : `/${ctx.name}.html`;
+      const url = new URL(found.canonical);
+      if (url.pathname !== expectedPath) {
+        return `canonical path is "${url.pathname}", expected "${expectedPath}"`;
+      }
+
+      const home = await page.evaluate(async () => {
+        const text = await (await fetch("index.html")).text();
+        return text.match(/<link rel="canonical" href="([^"]+)"/)?.[1] ?? null;
+      });
+      if (!home) return "index.html has no canonical to compare origins against";
+      if (new URL(home).origin !== url.origin) {
+        return `origin "${url.origin}" disagrees with the homepage's "${new URL(home).origin}"`;
+      }
+      return new URL(found.ogImage).origin === url.origin
+        ? null
+        : `og:image origin "${new URL(found.ogImage).origin}" is not the site's own`;
+    },
+  },
+  {
     id: "meta-description-present",
     pages: ALL,
     check: async (page) => {

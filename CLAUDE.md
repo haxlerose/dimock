@@ -179,10 +179,40 @@ deliberate exception.
 
 ## Page head
 
-Every page carries a unique `<title>`, a `<meta name="description">`, an Open Graph
-block, and an inline-SVG favicon. Order in the `<head>` matters: Bootstrap first,
-the three font links second, `site.css` last, so site rules win. Full canonical block
-in `docs/redesign-plan.md` Appendix B.
+Every page carries a unique `<title>`, a `<meta name="description">`, a
+`<link rel="canonical">`, an Open Graph block, and an inline-SVG favicon. Order in the
+`<head>` matters: Bootstrap first, the three font links second, `site.css` last, so
+site rules win. Full canonical block in `docs/redesign-plan.md` Appendix B.
+
+**The site is `dimockcampmeeting.org`.** The canonical link, `og:url`, and `og:image`
+are absolute URLs built on that origin — a relative `og:image` cannot be resolved by a
+social scraper, which is why link previews to this site used to render bare.
+`canonical-and-og-url-absolute` requires all three to be absolute, requires `og:url` to
+equal the canonical, requires the path to name that page, and requires every page to
+agree with the homepage's origin.
+
+**They currently say `http://`, not `https://`, on purpose** — see § HTTPS below. The
+spec reads the origin off `index.html` rather than hard-coding it, so switching all six
+pages to `https://` needs no edit to `checks/`.
+
+## HTTPS
+
+**HTTPS does not work on `dimockcampmeeting.org` as of 2026-07-28.** Port 443 is open,
+but the server aborts the handshake with TLS alert 80 (`internal_error`) and never
+presents a certificate. Plain `http://` works and serves the site; there is no
+HTTP→HTTPS redirect, so visitors are not bounced into the failure.
+
+This is hosting configuration at 1&1/IONOS. Nothing in this repository causes it and
+nothing here can fix it — deploying over SFTP cannot touch TLS. The remediation plan is
+`docs/https-fix-plan.md`.
+
+Two consequences while it stands:
+
+- **Fetch the live site over `http://` when verifying a deploy.** An `https://` fetch
+  fails for a reason that has nothing to do with the change being checked. Verify your
+  own TLS stack against another host before concluding the site is at fault.
+- **Absolute URLs in the page metadata use `http://`.** Pointing a canonical at a URL
+  that does not resolve is worse than pointing it at one that does.
 
 ## The shared shell — nav, footer, year script
 
