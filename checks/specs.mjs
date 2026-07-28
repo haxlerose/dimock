@@ -141,6 +141,22 @@ const seasonClock = (pick, time) => async (page) => {
  * you have to read close up — the stock certificate and the 1936 poster — but
  * the picture itself has to be on the page, where someone scrolling will see it.
  */
+/* The grounds' one address, and the one place the cottage sale is contactable.
+   Both are facts the owner owns; the checks only assert where they appear. */
+const ADDRESS_STREET = "46 Dimock Camp Road";
+const ADDRESS_TOWN = /Springville,\s*PA\s*18844/i;
+const COTTAGE_PHONE = /570-396-6331/;
+const COTTAGE_SELLER = /Kevin Setzer/i;
+
+/* Text of the page with the footer taken out, so "does this page say it" cannot
+   be answered by the footer every page already carries. */
+const splitFooter = () => {
+  const clean = (node) => (node?.textContent ?? "").replace(/\s+/g, " ").trim();
+  const clone = document.body.cloneNode(true);
+  clone.querySelectorAll(".site-footer").forEach((el) => el.remove());
+  return { body: clean(clone), footer: clean(document.querySelector(".site-footer")) };
+};
+
 const HISTORY_IMAGES = {
   about: ["walker.jpg", "train.jpg", "stock.jpg", "meeting.jpg", "taylor.jpg", "towner.jpg", "pinchot.jpg"],
   services: ["poster.jpg", "meeting.jpg"],
@@ -983,7 +999,7 @@ export const specs = [
   },
   {
     id: "heading-order-intact",
-    pages: ["index", "about", "services"],
+    pages: ["index", "about", "services", "visit", "contact"],
     check: async (page) => {
       const headings = await page.evaluate(() =>
         Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
@@ -1351,8 +1367,11 @@ export const specs = [
       }),
   },
   {
-    id: "no-tabs-on-about-and-services",
-    pages: ["about", "services"],
+    // Phase 8 took the last page out of tabs, so this widened from about and
+    // services to the whole site. Nothing on the site is behind a tab now, and
+    // nothing should go back behind one.
+    id: "no-tabs-anywhere",
+    pages: ALL,
     check: async (page) => {
       const found = await page.evaluate(() =>
         Array.from(document.querySelectorAll('[data-bs-toggle="tab"]')).map((el) =>
@@ -1366,7 +1385,7 @@ export const specs = [
   },
   {
     id: "sections-are-anchored",
-    pages: ["about", "services"],
+    pages: ["about", "services", "visit"],
     check: async (page) => {
       const headings = await page.evaluate(() =>
         Array.from(document.querySelectorAll(".section h2")).map((el) => ({
@@ -1467,6 +1486,128 @@ export const specs = [
       return report.empty.length === 0
         ? null
         : `${report.empty.length} history photograph(s) carry alt="": ${report.empty.join(", ")}`;
+    },
+  },
+  {
+    // Somebody driving here should not have to hunt. The footer carries the
+    // address on every page; the two pages about coming here say it themselves,
+    // where a visitor is already looking.
+    id: "address-present-on-key-pages",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const text = await page.evaluate(splitFooter);
+      const missingFrom = (where) => {
+        const gaps = [];
+        if (!text[where].includes(ADDRESS_STREET)) gaps.push(`"${ADDRESS_STREET}"`);
+        if (!ADDRESS_TOWN.test(text[where])) gaps.push("the town and ZIP");
+        return gaps;
+      };
+
+      const footerGaps = missingFrom("footer");
+      if (footerGaps.length > 0) {
+        return `the footer does not carry ${footerGaps.join(" or ")}`;
+      }
+      if (ctx.name !== "visit" && ctx.name !== "contact") return null;
+
+      const bodyGaps = missingFrom("body");
+      return bodyGaps.length === 0
+        ? null
+        : `${ctx.name}.html states the address only in the footer — the page itself is missing ${bodyGaps.join(" and ")}`;
+    },
+  },
+  {
+    // Gate D, declined 2026-07-28: the number lives on visit.html and nowhere
+    // else. A second copy is a second thing to update the day it changes.
+    id: "cottage-contact-is-visit-only",
+    pages: ALL,
+    check: async (page, ctx) => {
+      const text = await page.evaluate(
+        () => (document.body.textContent ?? "").replace(/\s+/g, " ").trim()
+      );
+      const hasPhone = COTTAGE_PHONE.test(text);
+      const hasSeller = COTTAGE_SELLER.test(text);
+
+      if (ctx.name === "visit") {
+        if (!hasPhone) return "visit.html no longer carries the cottage phone number";
+        if (!hasSeller) return "visit.html no longer names who to ask about the cottage";
+        return null;
+      }
+      return hasPhone
+        ? `${ctx.name}.html carries the cottage phone number — it belongs on visit.html only`
+        : null;
+    },
+  },
+  {
+    id: "contact-page-completeness",
+    pages: ["contact"],
+    check: async (page) => {
+      const found = await page.evaluate(() => {
+        const links = Array.from(document.querySelectorAll("main a, .section a")).map((a) =>
+          a.getAttribute("href") ?? ""
+        );
+        const text = document.querySelector(".section")?.textContent ?? "";
+        return {
+          mailto: links.some((href) => /^mailto:DimockCampMeeting@gmail\.com/i.test(href)),
+          directions: links.some((href) => /^visit\.html/i.test(href)),
+          text: text.replace(/\s+/g, " ").trim(),
+        };
+      });
+
+      const gaps = [];
+      if (!found.mailto) gaps.push("a mailto: link to DimockCampMeeting@gmail.com");
+      if (!found.directions) gaps.push("a link to visit.html for directions");
+      // Service times, in whatever words: a day and an hour.
+      if (!/Sunday/i.test(found.text) || !/6:00 ?pm/i.test(found.text)) {
+        gaps.push("the service times");
+      }
+      return gaps.length === 0 ? null : `the contact page is missing ${gaps.join(", ")}`;
+    },
+  },
+  {
+    // Gate D, declined 2026-07-28. The host runs PHP, so this stays a check
+    // rather than a fact of the platform: mailto: is the contact mechanism, and
+    // no page may come to depend on the server. viewlogs.php is reached by URL
+    // and linked from nothing — that is what keeps it out of this net.
+    id: "no-forms-on-site",
+    pages: ALL,
+    check: async (page) => {
+      const found = await page.evaluate(() => ({
+        forms: document.querySelectorAll("form").length,
+        php: Array.from(document.querySelectorAll("[href], [src], [action]"))
+          .map((el) =>
+            el.getAttribute("href") ?? el.getAttribute("src") ?? el.getAttribute("action") ?? ""
+          )
+          .filter((value) => /\.php(\?|#|$)/i.test(value)),
+      }));
+
+      if (found.forms > 0) return `${found.forms} <form> element(s) — the site takes no submissions`;
+      return found.php.length === 0
+        ? null
+        : `${found.php.length} reference(s) to a PHP endpoint, first: ${found.php[0]}`;
+    },
+  },
+  {
+    id: "map-iframe-labelled",
+    pages: ["visit"],
+    check: async (page) => {
+      const frames = await page.evaluate(() =>
+        Array.from(document.querySelectorAll("iframe")).map((frame) => ({
+          src: (frame.getAttribute("src") ?? "").slice(0, 40),
+          title: (frame.getAttribute("title") ?? "").trim(),
+          loading: frame.getAttribute("loading"),
+        }))
+      );
+      if (frames.length === 0) return "the map iframe is gone";
+
+      const untitled = frames.filter((frame) => frame.title === "");
+      if (untitled.length > 0) {
+        // An unlabelled frame is announced as "frame" and nothing else.
+        return `${untitled.length} iframe(s) have no title, first: ${untitled[0].src}…`;
+      }
+      const eager = frames.filter((frame) => frame.loading !== "lazy");
+      return eager.length === 0
+        ? null
+        : `${eager.length} iframe(s) are not loading="lazy", first: ${eager[0].src}…`;
     },
   },
 ];

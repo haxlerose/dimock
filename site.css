@@ -525,42 +525,16 @@ img {
   margin-bottom: 1.75rem;
 }
 
-.hero {
-  height: 62vh;
-  min-height: 430px;
-  max-height: 600px;
-}
-
-.hero-overlay {
-  background: rgba(24, 28, 23, 0.48);
-}
-
-.hero-title,
-.hero-subtitle {
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
-}
-
-.hero-title {
-  font-size: clamp(2.4rem, 6.4vw, 4.4rem);
-}
-
-/* The subtitle wraps at 390px, where the 1.12 heading leading is too tight. */
-.hero-subtitle {
-  line-height: 1.3;
-}
-
 /* ---------------------------------------------------------------------------
-   The editorial hero — type at bottom-left over a gradient scrim. The homepage
-   uses it; contact.html still uses the centred .hero above, and Phase 8 moves
-   it across, after which the .hero-overlay / .hero-title / .hero-subtitle rules
-   go. Both spellings carry .hero so the contrast spec's skip list, which cannot
-   measure text over a photograph, reaches either one.
+   The hero — type at bottom-left over a gradient scrim. One spelling, used by
+   index.html and contact.html. Phase 8 moved contact off the old centred hero
+   and deleted its .hero-overlay / .hero-title / .hero-subtitle rules. .hero
+   itself stays on the element because the contrast spec's skip list, which
+   cannot measure text over a photograph, is keyed to it.
    --------------------------------------------------------------------------- */
 .hero-feature {
   align-items: flex-end;
   display: flex;
-  height: auto;
-  max-height: none;
   min-height: min(78vh, 660px);
   overflow: hidden;
   position: relative;
@@ -627,27 +601,6 @@ img {
   max-width: 36ch;
 }
 
-/* One reading column for the whole pane, not one per child: `ch` resolves
-   against each element's own font-size, so per-child caps left the headings
-   hanging outside the paragraphs' left edge. The column is flush left with the
-   page title above it — a centred column beside a left-aligned heading reads
-   as a mistake.
-
-   Phase 7 took about.html and services.html out of tabs; visit.html is the last
-   page still using this, and Phase 8 takes it out too. */
-.tab-pane {
-  max-width: var(--measure);
-}
-
-/* A sub-heading belongs to what follows it, not to what precedes it. */
-.tab-pane > h5 {
-  margin-top: 2.25rem;
-}
-
-.tab-pane > h5:first-of-type {
-  margin-top: 0;
-}
-
 /* ---------------------------------------------------------------------------
    Anchored sections (Phase 7)
    --------------------------------------------------------------------------- */
@@ -704,41 +657,6 @@ img {
 .prayer {
   margin-inline: auto;
   text-align: center;
-}
-
-/* The in-page tabs take the same ochre underline as the site nav, so "where am
-   I" looks the same in both places. */
-.nav-underline {
-  --bs-nav-underline-gap: 2rem;
-  --bs-nav-underline-link-active-color: var(--pine-deep);
-
-  border-bottom: 1px solid var(--rule);
-}
-
-.nav-underline .nav-link {
-  color: var(--ink);
-}
-
-.nav-underline .nav-link:hover,
-.nav-underline .nav-link:focus,
-.nav-underline .nav-link.active {
-  color: var(--pine-deep);
-}
-
-.nav-underline .nav-link.active {
-  border-bottom-color: var(--ochre);
-}
-
-.nav-underline .nav-link:focus {
-  box-shadow: none;
-  outline: none;
-}
-
-.nav-underline .nav-link:focus-visible {
-  border-radius: 0.15rem;
-  box-shadow: 0 0 0 0.16rem rgba(44, 87, 65, 0.2);
-  outline: 2px solid rgba(44, 87, 65, 0.4);
-  outline-offset: 0.2rem;
 }
 
 .inline-reference {
@@ -970,12 +888,6 @@ img {
     font-size: 1.05rem;
   }
 
-  .hero {
-    min-height: 390px;
-  }
-
-  /* The rule above is for the centred hero; the editorial one keeps its own
-     proportion at every width. */
   .hero-feature {
     min-height: min(78vh, 660px);
   }

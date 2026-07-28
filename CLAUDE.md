@@ -116,15 +116,27 @@ restructured; Phase 9 deletes both prototype files.
 |------|---------|
 | `index.html` | Editorial hero, next-service band, mission/vision, photography, heritage + milestones, address strip. Rebuilt in Phase 5. |
 | `index-prototype.html` | First-draft editorial homepage, reference only — not linked, not deployed. |
-| `about.html` | Tabbed: history + landmark designation; many modals |
-| `services.html` | Tabbed: camp meeting / rekindling / prayer; modals |
+| `about.html` | Anchored sections: history + landmark designation; a few modals. Rebuilt in Phase 7. |
+| `services.html` | Anchored sections: camp meeting / rekindling / prayer; one modal. Rebuilt in Phase 7. |
 | `events.html` | Season schedule — one card per event, and the source of truth for the whole site's schedule |
-| `visit.html` | Tabbed: directions + attractions + cottages; carousel modals |
-| `contact.html` | Hero + contact card |
+| `visit.html` | Anchored sections: directions + map, attractions, cottages for sale; carousel modals. Rebuilt in Phase 8. |
+| `contact.html` | Editorial hero, then one section: email, post, service times, directions, cottages. Rebuilt in Phase 8. |
 
 `backup/` holds old versions — not part of the live site, **never edit it**.
 `docs/` holds planning documents. `viewlogs.php` is a password-protected log
 viewer, not linked from the nav.
+
+**No forms, and no PHP the site depends on.** The host runs PHP, so a server-side
+contact form was proposed in Phase 8 and **the owner declined it, 2026-07-28**. The
+contact mechanism is the `mailto:` link. `no-forms-on-site` fails on any `<form>` and
+on any `href`/`src`/`action` pointing at a `.php` file — `viewlogs.php` stays out of
+that net only because nothing links to it. Do not re-propose the form.
+
+**The cottage-sale contact belongs to `visit.html` alone.** Kevin Setzer's name and
+570-396-6331 appear in Visit's cottages section and nowhere else; duplicating them onto
+the contact page was declined in the same conversation. Contact links to
+`visit.html#cottages` instead. `cottage-contact-is-visit-only` fails both ways — if
+Visit loses the number, and if any other page gains it.
 
 ## Color scheme
 
@@ -146,7 +158,7 @@ Landed in `site.css` (Phase 2). Fraunces for `h1`–`h4` and `.navbar-brand`, In
 everything else. Body is `1.0625rem` / `1.7` — **a floor, not a target; never reduce
 it for visual balance.** Headings are weight 600 at `line-height: 1.12` with fluid
 `clamp()` sizes. `--measure` (66ch) caps line length for sustained reading, applied
-via the `.measure` class and the `.tab-pane`, `.notice`, and `.event-body` rules. Long-form
+via the `.measure` class and the `.notice` and `.event-body` rules. Long-form
 prose is left-aligned everywhere; the prayer on `services.html` is the one
 deliberate exception.
 
@@ -185,12 +197,17 @@ come from `site.css`. Pages carry no inline `<style>` block.
 
 ## Hero pattern
 
-Two spellings exist, both carrying `.hero` so the contrast spec's skip list —
-which cannot measure text over a photograph — reaches either.
+One spelling, `.hero .hero-feature`, on the two pages that have a hero:
+`index.html` and `contact.html`. The `.hero` class earns its place by being what
+the contrast spec's skip list is keyed to — that spec cannot measure text over a
+photograph. Phase 8 moved contact off the old centered hero and deleted
+`.hero-overlay`, `.hero-title`, `.hero-subtitle`, and the bare `.hero` sizing
+rule; `.hero-feature` had already overridden all three of that rule's
+declarations, so nothing moved when it went.
 
-**`index.html` — the editorial hero (`.hero .hero-feature`).** The approved
-direction: the image fills the block, a gradient `.hero__scrim` darkens only the
-bottom where the type sits, and the type sets flush left at the bottom.
+The approved direction: the image fills the block, a gradient `.hero__scrim`
+darkens only the bottom where the type sits, and the type sets flush left at the
+bottom.
 
 ```html
 <header class="hero hero-feature">
@@ -208,29 +225,8 @@ bottom where the type sits, and the type sets flush left at the bottom.
 
 The hero image is decorative — the `<h1>` beside it carries the meaning — so it
 takes `alt=""` and is the **one** image on the page exempt from `loading="lazy"`.
-
-**`contact.html` — the old centered hero (`.hero`, `.hero-overlay`,
-`.hero-title`, `.hero-subtitle`).** Full-bleed image under a flat overlay with
-the text shadowed and vertically centered. Phase 8 moves it onto
-`.hero-feature`, after which those four rules go.
-
-```html
-<div class="hero position-relative overflow-hidden d-flex align-items-center">
-  <img src="chapel.jpg" alt="..." class="img-fluid position-absolute w-100 h-100"
-       style="object-fit: cover; object-position: center;" />
-  <div class="hero-overlay position-absolute w-100 h-100"></div>
-  <div class="position-relative w-100 px-3 px-md-0">
-    <div class="container">
-      <div class="row">
-        <div class="col-12 col-md-8 col-lg-6 ms-md-auto">
-          <h1 class="hero-title display-3 fw-bold text-light">...</h1>
-          <h4 class="hero-subtitle text-light mt-3">...</h4>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-```
+The `<h1>` names the page, not the site: "Dimock Camp Meeting Ground" on the
+homepage, "Contact Us" on contact, with the site name moved up to the eyebrow.
 
 ## The next-service band (index)
 
@@ -357,9 +353,10 @@ rather than naming a date. **Pasting in a new season must leave `checks/run.sh` 
 with no edit to `checks/`** — verified against a six-card 2027 season, and against
 four deliberate breaks, each of which a spec named.
 
-## Anchored sections (about, services)
+## Anchored sections (about, services, visit)
 
-Phase 7 took both pages out of tabs. Each page is now a masthead `.section` — `<h1>`,
+Phase 7 took About and Services out of tabs; Phase 8 did the same to Visit, and no
+page on the site uses tabs any more. Each page is now a masthead `.section` — `<h1>`,
 optionally a `.lede`, and a `.page-contents` list of in-page links — followed by one
 `.section` per topic, alternating with `.section-paper`. A section is:
 
@@ -378,24 +375,26 @@ something a visitor may be sent a link to. `:is(h1,h2,h3)[id]` gets
 `scroll-margin-top: 7rem` so arriving by fragment does not park the heading under the
 sticky nav; `sections-are-anchored` visits each fragment and measures it. The reading
 column comes from `.measure` on a wrapper div — one column for the whole section, not
-one per child, for the same reason `.tab-pane` did it that way.
+one per child. On `visit.html` the map sits inside that column too: at full
+`.container-narrow` width a 16×9 frame is 660px tall and swallows the page.
 
 Heading levels are `h1` → `h2` (section) → `h3` (sub-heading), no skips.
-`heading-order-intact` covers `index`, `about`, and `services`.
+`heading-order-intact` covers every page but `events`.
 
 The prayer on `services.html` is the one deliberate centering exception: `.measure
 .prayer`, which centers the text and the column together.
 
-## Tab pattern (visit only)
+## No tabs, anywhere
 
-`visit.html` is the last page still using tabs; Phase 8 takes it out too. Tabs use
-`nav-underline` with the same ochre active underline as the site nav; the panes sit in
-a `.section` + `.container-narrow`, with `.tab-pane` capping the reading column at
-`--measure`. Each pane opens with an `.eyebrow` above a left-aligned `<h2>`.
+Phase 8 removed the last of them, and with them the `.tab-pane` and `.nav-underline`
+rules from `site.css`. `no-tabs-anywhere` runs on all six pages and fails on any
+`data-bs-toggle="tab"`. Content behind a tab cannot be linked to, cannot be found with
+the browser's own find, and does not print — an anchored `.section` is the replacement.
 
 **No positive `tabindex` anywhere.** A positive value does not move one element
 forward, it moves every element without one to the back of the queue for the whole
-page. The panes carry `tabindex="0"`; `no-positive-tabindex` runs on all six pages.
+page. The tab panes were the only elements that carried `tabindex` at all;
+`no-positive-tabindex` still runs on all six pages.
 
 ## Modal pattern
 
