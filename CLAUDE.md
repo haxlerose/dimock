@@ -13,6 +13,19 @@ from 1877. `events.html` agrees: 2026 is the 149th season. Confirmed by the owne
 2026-07-27. `about.html` is the source of truth for the *events* of the history,
 not for the founding year.
 
+**`about.html` describes the past. Do not lift its numbers into the present
+tense.** It is a history, so most figures in it are historical, and a few read
+like present-day facts about the grounds when they are not:
+
+| Figure in `about.html` | Actually |
+|---|---|
+| "about 100 cottages" | The heyday count, in a paragraph about tents and 1918. **Today it is around 30.** |
+| "the 23.2-acre grounds" | The 1875 lease from Col. Olney Bailey, before the association bought the property. Still about 23 acres — confirmed by the owner 2026-07-28. |
+
+Both of these went onto the homepage as present-tense claims in Phase 5 and one
+was wrong. Before stating a number about the grounds *as they are*, check whether
+the sentence you took it from is describing 1875.
+
 ## Design authority
 
 **Read `docs/design-direction.md` before making any visual change**, and
