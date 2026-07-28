@@ -1490,8 +1490,14 @@ export const specs = [
   },
   {
     // Somebody driving here should not have to hunt. The footer carries the
-    // address on every page; the two pages about coming here say it themselves,
-    // where a visitor is already looking.
+    // address on every page, and visit.html says it again where a visitor is
+    // already looking for it.
+    //
+    // contact.html deliberately does not. 46 Dimock Camp Road is where the
+    // grounds are, not an address that receives mail — the association has a PO
+    // box — so an address printed on the contact page is an invitation to send
+    // post that never arrives. Owner's decision, 2026-07-28. If the PO box is
+    // ever added here, add it as its own fact; do not reach for this one.
     id: "address-present-on-key-pages",
     pages: ALL,
     check: async (page, ctx) => {
@@ -1507,12 +1513,12 @@ export const specs = [
       if (footerGaps.length > 0) {
         return `the footer does not carry ${footerGaps.join(" or ")}`;
       }
-      if (ctx.name !== "visit" && ctx.name !== "contact") return null;
+      if (ctx.name !== "visit") return null;
 
       const bodyGaps = missingFrom("body");
       return bodyGaps.length === 0
         ? null
-        : `${ctx.name}.html states the address only in the footer — the page itself is missing ${bodyGaps.join(" and ")}`;
+        : `visit.html states the address only in the footer — the page itself is missing ${bodyGaps.join(" and ")}`;
     },
   },
   {
@@ -1538,28 +1544,26 @@ export const specs = [
     },
   },
   {
+    // Two ways in and no more: write to us, or come and find us. The owner cut
+    // the postal address, the service times, and the cottage pointer on
+    // 2026-07-28 — each of them lives somewhere it is already correct, and a
+    // second copy on this page is a second thing to keep true.
     id: "contact-page-completeness",
     pages: ["contact"],
     check: async (page) => {
       const found = await page.evaluate(() => {
-        const links = Array.from(document.querySelectorAll("main a, .section a")).map((a) =>
+        const links = Array.from(document.querySelectorAll(".section a")).map((a) =>
           a.getAttribute("href") ?? ""
         );
-        const text = document.querySelector(".section")?.textContent ?? "";
         return {
           mailto: links.some((href) => /^mailto:DimockCampMeeting@gmail\.com/i.test(href)),
           directions: links.some((href) => /^visit\.html/i.test(href)),
-          text: text.replace(/\s+/g, " ").trim(),
         };
       });
 
       const gaps = [];
       if (!found.mailto) gaps.push("a mailto: link to DimockCampMeeting@gmail.com");
       if (!found.directions) gaps.push("a link to visit.html for directions");
-      // Service times, in whatever words: a day and an hour.
-      if (!/Sunday/i.test(found.text) || !/6:00 ?pm/i.test(found.text)) {
-        gaps.push("the service times");
-      }
       return gaps.length === 0 ? null : `the contact page is missing ${gaps.join(", ")}`;
     },
   },

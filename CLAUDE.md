@@ -120,7 +120,7 @@ restructured; Phase 9 deletes both prototype files.
 | `services.html` | Anchored sections: camp meeting / rekindling / prayer; one modal. Rebuilt in Phase 7. |
 | `events.html` | Season schedule — one card per event, and the source of truth for the whole site's schedule |
 | `visit.html` | Anchored sections: directions + map, attractions, cottages for sale; carousel modals. Rebuilt in Phase 8. |
-| `contact.html` | Editorial hero, then one section: email, post, service times, directions, cottages. Rebuilt in Phase 8. |
+| `contact.html` | Editorial hero, then one short section: the email address and a link to directions. Nothing else — see below. Rebuilt in Phase 8. |
 
 `backup/` holds old versions — not part of the live site, **never edit it**.
 `docs/` holds planning documents. `viewlogs.php` is a password-protected log
@@ -134,9 +134,19 @@ that net only because nothing links to it. Do not re-propose the form.
 
 **The cottage-sale contact belongs to `visit.html` alone.** Kevin Setzer's name and
 570-396-6331 appear in Visit's cottages section and nowhere else; duplicating them onto
-the contact page was declined in the same conversation. Contact links to
-`visit.html#cottages` instead. `cottage-contact-is-visit-only` fails both ways — if
-Visit loses the number, and if any other page gains it.
+the contact page was declined in the same conversation.
+`cottage-contact-is-visit-only` fails both ways — if Visit loses the number, and if any
+other page gains it.
+
+**`contact.html` is deliberately short: an email address and a link to directions.**
+Drafts of it also carried the postal address, the service times, and a pointer to the
+cottage listing; the owner cut all three on 2026-07-28. Each already exists somewhere it
+is correct — the schedule on `events.html`, the cottage on `visit.html` — and a copy
+here is a second thing to keep true. **Do not put a postal address on this page**: 46
+Dimock Camp Road is where the grounds are, not an address that receives mail. The
+association uses a PO box; its number is not in this repository. `contact-page-completeness`
+asserts only the two things that must be there, and `address-present-on-key-pages`
+exempts contact on purpose.
 
 ## Color scheme
 
