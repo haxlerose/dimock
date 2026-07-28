@@ -25,15 +25,17 @@ describing 1875.
 
 ## Design authority
 
-**Read `docs/design-direction.md` before any visual change** and `docs/redesign-plan.md`
-before doing the work. The first carries the approved palette, typography, component
-system, and accessibility standards; the second is the phased plan with checkboxes. This
-file describes the code as it stands; those describe where it is going. Where they
-disagree about intent, the design direction wins.
+**Read `docs/design-direction.md` before any visual change.** It carries the approved
+palette, typography, component system, and accessibility standards, and it is the standing
+authority — where it and this file disagree about intent, the design direction wins.
+
+`docs/redesign-plan.md` is a **finished record**, not a live plan: the redesign it
+describes shipped in full. Two parts of it stay canonical and are cited below — Appendix A
+(nav and footer markup) and Appendix B (the `<head>` block). Do not treat the rest as work
+still to do.
 
 `docs/` is gitignored — local to this working copy, not in the repository. If those
-documents are missing, the redesign has to be replanned; do not guess the direction from
-the code alone.
+documents are missing, do not guess the direction from the code alone; ask.
 
 ## Verifying changes
 
