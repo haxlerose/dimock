@@ -76,11 +76,13 @@ into the host page's console. Nothing in this repository can prevent it. Google
 Fonts is deliberately **not** exempt, so a font that fails to load still fails
 the run.
 
-A spec may declare `clock: "2026-08-09T18:00:00"`. The runner then gives it a page of
-its own with `Date` frozen to that moment — installed before the document's own
-scripts run, which is why it cannot share the page the other specs use. The stub
-leaves the multi-argument constructor alone, so `new Date(y, m - 1, d)` still yields
-local midnight, which is what `schedule.js` relies on.
+A spec may declare `clock`, either as an ISO string or as a function
+`(page, ctx) => iso` handed the already-loaded, unstubbed page. The runner then gives
+the spec a page of its own with `Date` frozen to that moment — installed before the
+document's own scripts run, which is why it cannot share the page the other specs use.
+The stub leaves the multi-argument constructor alone, so `new Date(y, m - 1, d)` still
+yields local midnight, which is what `schedule.js` relies on. Every schedule spec uses
+the function form so that no clock names a date from a particular season.
 
 ## Stack
 
@@ -277,48 +279,81 @@ the only carrier of meaning.
 ## Events card pattern
 
 Each event is a flat block — a thin colored left rule, the day and date in Fraunces,
-the title as an `<h2>`, the description in Inter. No card, no header fill.
+the title as an `<h2>`, the description in Inter. No card, no header fill. Three
+fill-in-the-blanks and no attributes:
 
 ```html
-<article class="event-card event-card-sunday mb-4"
-         data-event-date="2026-08-02" data-event-title="Event Title">
-  <p class="event-day">Sun &middot; <span class="no-break">Aug 2</span></p>
+<article class="event-card">
+  <p class="event-day">Sun, Aug 2</p>
   <h2 class="event-title">Event Title</h2>
   <p class="event-body">Description</p>
 </article>
 ```
 
-`event-card-sunday` tints the rule and day pine, `event-card-saturday` ochre — but the
-day is always spelled out, so stripping every color from the page loses nothing. The
-`day-conveyed-in-text` spec enforces that.
+**Do not add anything to that `<article>` tag.** Phase 6.5 removed `data-event-date`,
+`data-event-title`, `event-card-sunday` / `event-card-saturday`, `mb-4`, and the
+`<span class="no-break">` — every one of them was an invisible second copy of a fact
+the card already states, or a utility class a non-developer had to know. The spacing
+lives on `.event-card` and the unbroken date on `.event-day` in `site.css`.
+`season-is-self-consistent` fails if any of them comes back.
+
+`schedule.js` applies `event-card-sunday` / `event-card-saturday` from the date it
+parsed. Tint is decoration, so script may own it; the day is spelled out in the markup,
+so nothing is gated. (Checked: with `defer`, the classes land before first contentful
+paint even on a throttled connection — the cards do not flash untinted.)
+
+The day line is read leniently — `Sat, Jul 11`, `Saturday, July 11`, `Sat · Jul 11`,
+and `Sat Jul 11` all parse. The month matches by case-insensitive prefix of three
+characters or more. **The weekday word is not used for parsing**; it is redundant on
+purpose, and `season-is-self-consistent` is what makes the redundancy pay — it fails
+when the word and the date disagree, which is the one mistake lenient parsing cannot
+catch. An unreadable day line degrades rather than lies: the card stays exactly where
+the author put it, untinted and unsorted, with its text intact.
 
 ## The schedule — `events.html` is the source of truth
 
-The nine cards on `events.html` are the only place the season is written down.
-Each carries `data-event-date="YYYY-MM-DD"` and `data-event-title`, which are a
-machine-readable second copy of what the card already says in words;
-`event-cards-have-dates` fails if the two drift apart. **Edit the cards, not the
-script** — descriptions carry quotation marks, `<cite>` tags, and links, which is
-exactly why they are not JavaScript string literals.
+The cards on `events.html` are the only place the season is written down, and each
+fact appears once, where the visitor reads it. The year is the exception — it is not
+on any card, so it comes from `data-season="2026"` on the `.schedule` wrapper, written
+once for the whole season. A missing or non-numeric `data-season` yields no events at
+all: the page is left as served and the homepage keeps its fallback.
+
+**Edit the cards, not the script** — descriptions carry quotation marks, `<cite>` tags,
+and links, which is exactly why they are not JavaScript string literals. The comment
+above the card list is the whole of the documentation the next editor gets (`docs/` is
+gitignored and never deployed) — keep it accurate.
 
 `schedule.js` (loaded `defer` on `index.html` and `events.html`, the same file on
 both) does two things and gates nothing:
 
-- On `events.html` it wraps the cards in a `<div class="schedule"
-  data-schedule="events">`, sorts them, and inserts `<h2 class="schedule-group">`
-  headings — "Upcoming" and "Earlier this season". Each heading appears only when
-  it has cards under it. Past cards get `.is-past` and are **dimmed to `--muted`,
-  never hidden**; the first upcoming card gets `.is-next` and a `.event-flag`
-  reading "Next service", because the marker must be words and not a tint.
+- On `events.html` it reads the cards inside `<div class="schedule"
+  data-schedule="events" data-season="…">`, sorts them, tints them, and inserts
+  `<h2 class="schedule-group">` headings — "Upcoming" and "Earlier this season".
+  Each heading appears only when it has cards under it. Past cards get `.is-past`
+  and are **dimmed to `--muted`, never hidden**; the first upcoming card gets
+  `.is-next` and a `.event-flag` reading "Next service", because the marker must be
+  words and not a tint. Once every service has passed it adds a `.schedule-note`
+  above the list — *"The 2026 season has ended. Next season's schedule will be
+  posted here when it is set."* — with the year from `data-season`.
 - On `index.html` it fetches `events.html`, parses it with `DOMParser`, and writes
   the next service into the band. On any failure it returns without touching the
   DOM, leaving the true fallback in place.
 
 Three traps, each already paid for: `fetch()` cannot read a `file://` page (review
-through `checks/run.sh`, not by opening the file); `Date.parse` on an ISO string is
-UTC and rolls the date backward in US timezones, so dates are built with
-`new Date(y, m - 1, d)`; and an event stays upcoming through the end of its own
-day, so tonight's service does not vanish at midnight this morning.
+through `checks/run.sh`, not by opening the file); a date built from a UTC-parsed ISO
+string rolls backward in US timezones, so dates are built with `new Date(y, m - 1, d)`
+and round-tripped to reject "Feb 31"; and an event stays upcoming through the end of
+its own day, so tonight's service does not vanish at midnight this morning.
+
+**`checks/` knows no particular season.** `SEASON_2026` is gone. The schedule specs
+read the season off `events.html` and assert only that it agrees with itself — day
+lines parse, weekday words match their dates, dates ascend, all fall in the
+`data-season` year, and the eyebrow's ordinal is that year minus 1877. Stubbed clocks
+are derived the same way: `spec.clock` may be a function `(page, ctx) => iso` given
+the already-loaded unstubbed page, so a spec says "the day after the last service"
+rather than naming a date. **Pasting in a new season must leave `checks/run.sh` green
+with no edit to `checks/`** — verified against a six-card 2027 season, and against
+four deliberate breaks, each of which a spec named.
 
 ## Tab pattern (about, services, visit)
 

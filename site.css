@@ -736,9 +736,14 @@ img {
 
 /* An event is a thin rule, a date, and a heading — no box, no filled header.
    The day is tinted, but it is also spelled out, so removing every colour from
-   the page loses nothing. */
+   the page loses nothing.
+
+   The spacing and the unbroken date used to be Bootstrap utility classes on
+   every card. They are here instead so that a card in events.html is three
+   lines a non-developer can copy without knowing what mb-4 means. */
 .event-card {
   border-left: 2px solid var(--rule);
+  margin-bottom: 1.5rem;
   padding-left: clamp(1rem, 3vw, 1.75rem);
 }
 
@@ -748,8 +753,12 @@ img {
   font-weight: 600;
   letter-spacing: 0.01em;
   margin-bottom: 0.15rem;
+  white-space: nowrap;
 }
 
+/* Applied by schedule.js from the date it read off the card. Tint is
+   decoration, so script may own it; the day itself is spelled out in the
+   markup and is never the script's to supply. */
 .event-card-sunday {
   border-left-color: var(--pine);
 }
@@ -793,6 +802,17 @@ img {
   border-top: 0;
   margin-top: 0;
   padding-top: 0;
+}
+
+/* Once every service has passed, nine undated-looking cards imply a service is
+   still coming. A static file cannot say otherwise on its own, so schedule.js
+   says it — above the list, in words, where the season is named. */
+.schedule-note {
+  border-left: 0.25rem solid var(--ochre);
+  color: var(--ink);
+  margin-bottom: 2.5rem;
+  max-width: var(--measure);
+  padding-left: clamp(1rem, 3vw, 1.75rem);
 }
 
 .event-flag {

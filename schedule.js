@@ -5,9 +5,14 @@
  * service without anybody editing it every week.
  *
  * Everything here is an enhancement. With this file missing, blocked, or
- * broken, the events page still lists all nine services in document order and
- * the homepage still says "Sunday evening services at 6:00 pm" — which is true
- * on any date. Nothing is ever hidden; past services are dimmed, not removed.
+ * broken, the events page still lists every service in document order and the
+ * homepage still says "Sunday evening services at 6:00 pm" — which is true on
+ * any date. Nothing is ever hidden; past services are dimmed, not removed.
+ *
+ * Every fact is read off the card the visitor is already reading: the day line
+ * gives the date, the heading gives the title, and data-season on the wrapper
+ * gives the year. Nothing here needs the schedule spelled out a second time in
+ * an attribute nobody proofreads.
  */
 (function () {
   'use strict';
@@ -21,44 +26,93 @@
     'Thursday', 'Friday', 'Saturday'
   ];
 
-  /* An ISO date handed to Date.parse is read as UTC, which lands on the
-     previous day everywhere in the United States. Build it from its parts so
-     it means local midnight, which is what a date on a poster means. */
-  function parseLocalDate(iso) {
-    var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso == null ? '' : iso).trim());
-    if (!parts) return null;
-    var year = Number(parts[1]);
-    var month = Number(parts[2]) - 1;
-    var day = Number(parts[3]);
+  /* Builds a local-midnight date from its parts, which is what a date on a
+     poster means. An ISO string handed to Date.parse is read as UTC and lands
+     on the previous day everywhere in the United States.
+
+     The round trip rejects "Feb 31" and friends, which JavaScript would
+     otherwise roll forward into March rather than treat as the typo it is. */
+  function localDate(year, month, day) {
     var date = new Date(year, month, day);
     if (isNaN(date.getTime())) return null;
-    /* Rejects 2026-02-31 and friends, which JavaScript would happily roll
-       forward into March rather than treating as the typo it is. */
     if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
       return null;
     }
     return date;
   }
 
-  /* Returns {date, title, element} for every readable card, earliest first. A
-     card with no usable date is left out of the ordering rather than guessed
-     at — it stays on the page exactly where the author put it. */
+  /* Reads the one line the owner actually writes: an optional weekday word,
+     a month, and a day. "Sat, Jul 11", "Saturday, July 11", "Sat · Jul 11" and
+     "Sat Jul 11" all mean the same thing and all parse. A month is matched by
+     case-insensitive prefix of three characters or more, which is unambiguous
+     across all twelve names.
+
+     The weekday word is deliberately not used: it is redundant, and the check
+     harness is what makes the redundancy pay by failing when the word and the
+     date disagree. Returns null on anything it cannot read. */
+  function parseEventDay(text, seasonYear) {
+    var normalized = String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
+    var parts = /^(?:[A-Za-z]{2,9}\.?[,·\s]+)?([A-Za-z]{3,9})\.?[,·\s]+(\d{1,2})\b/
+      .exec(normalized);
+    if (!parts) return null;
+
+    var wanted = parts[1].toLowerCase();
+    var month = -1;
+    for (var i = 0; i < MONTHS.length; i += 1) {
+      if (MONTHS[i].toLowerCase().indexOf(wanted) === 0) { month = i; break; }
+    }
+    if (month < 0) return null;
+
+    return localDate(seasonYear, month, Number(parts[2]));
+  }
+
+  /* Returns {date, title, element} for every readable card, earliest first.
+     A card whose day line cannot be read is left out of the ordering rather
+     than guessed at — it stays on the page exactly where the author put it,
+     untinted and unsorted, with its text intact.
+
+     The year is the one thing a card does not carry, so it comes from
+     data-season on the wrapper: written once for the whole season, and the
+     only thing on the page that knows what year it is. Without it there is
+     nothing to build a date from, and doing nothing is the right answer. */
   function readEvents(root) {
+    var list = root.querySelector
+      ? (root.matches && root.matches('[data-schedule="events"]')
+          ? root
+          : root.querySelector('[data-schedule="events"]'))
+      : null;
+    if (!list) return [];
+
+    var declared = (list.getAttribute('data-season') || '').trim();
+    if (!/^\d{4}$/.test(declared)) return [];
+    var seasonYear = Number(declared);
+
     var events = [];
     Array.prototype.forEach.call(
-      root.querySelectorAll('.event-card[data-event-date]'),
+      list.querySelectorAll('.event-card'),
       function (element) {
-        var date = parseLocalDate(element.getAttribute('data-event-date'));
+        var day = element.querySelector('.event-day');
+        var title = element.querySelector('.event-title');
+        var date = day ? parseEventDay(day.textContent, seasonYear) : null;
         if (!date) return;
         events.push({
           date: date,
-          title: (element.getAttribute('data-event-title') || '').trim(),
+          title: title ? title.textContent.replace(/\s+/g, ' ').trim() : '',
           element: element
         });
       }
     );
     events.sort(function (a, b) { return a.date - b.date; });
     return events;
+  }
+
+  /* Tint is decoration and script may own it; the day is spelled out in the
+     markup and never is. Anything that is neither a Saturday nor a Sunday
+     simply keeps the neutral rule it was served with. */
+  function tint(event) {
+    var day = event.date.getDay();
+    if (day === 0) event.element.classList.add('event-card-sunday');
+    else if (day === 6) event.element.classList.add('event-card-saturday');
   }
 
   /* An event belongs to the whole of its own day: tonight's service is still
@@ -107,11 +161,24 @@
     var split = partition(events, new Date());
     var ordered = document.createDocumentFragment();
 
+    /* Nine past services with nothing said about them read as a season still
+       to come. Say so instead — and take the year from the same attribute
+       everything else does, so this never needs hand-editing either. */
+    if (split.upcoming.length === 0 && split.past.length > 0) {
+      var note = document.createElement('p');
+      note.className = 'schedule-note';
+      note.textContent =
+        'The ' + list.getAttribute('data-season') + ' season has ended. ' +
+        'Next season’s schedule will be posted here when it is set.';
+      ordered.appendChild(note);
+    }
+
     /* A heading only appears when it has something under it: no "Earlier this
        season" before the season starts, no "Upcoming" once it has ended. */
     if (split.upcoming.length > 0) {
       ordered.appendChild(groupHeading('Upcoming'));
       split.upcoming.forEach(function (event, index) {
+        tint(event);
         if (index === 0) flagAsNext(event.element);
         ordered.appendChild(event.element);
       });
@@ -119,6 +186,7 @@
     if (split.past.length > 0) {
       ordered.appendChild(groupHeading('Earlier this season'));
       split.past.forEach(function (event) {
+        tint(event);
         event.element.classList.add('is-past');
         ordered.appendChild(event.element);
       });

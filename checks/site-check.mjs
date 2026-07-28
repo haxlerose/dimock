@@ -89,24 +89,31 @@ for (const viewport of VIEWPORTS) {
     for (const spec of specs) {
       if (!spec.pages.includes(name)) continue;
 
+      const ctx = { consoleErrors, name, viewport, BASE_URL };
+
       // A spec that pins the clock gets a page of its own. The stub has to be
       // in place before the document's scripts run, so it cannot be bolted on
       // to the page every other spec is already sharing.
+      //
+      // The clock may be a function rather than a literal date. It is handed
+      // the already-loaded, unstubbed page, so a spec can say "the day after
+      // the last service" and read that out of events.html instead of naming a
+      // date that stops being true when next season is pasted in.
       let target = page;
-      let errors = consoleErrors;
       let scoped = null;
-      if (spec.clock) {
-        scoped = await context.newPage();
-        errors = [];
-        watchConsole(scoped, errors);
-        await stubClock(scoped, spec.clock);
-        await scoped.goto(`${BASE_URL}/${name}.html`, { waitUntil: "networkidle" });
-        target = scoped;
-      }
-
       let detail;
       try {
-        detail = await spec.check(target, { consoleErrors: errors, name, viewport, BASE_URL });
+        const clockAt =
+          typeof spec.clock === "function" ? await spec.clock(page, ctx) : spec.clock;
+        if (clockAt) {
+          scoped = await context.newPage();
+          ctx.consoleErrors = [];
+          watchConsole(scoped, ctx.consoleErrors);
+          await stubClock(scoped, clockAt);
+          await scoped.goto(`${BASE_URL}/${name}.html`, { waitUntil: "networkidle" });
+          target = scoped;
+        }
+        detail = await spec.check(target, ctx);
       } catch (error) {
         detail = `threw: ${error.message}`;
       }

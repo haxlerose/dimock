@@ -70,15 +70,48 @@
           </p>
         </div>
 
-        <!-- schedule.js splits the list below into what is still to come and
-             what has already happened, and the homepage reads its next-service
-             band out of these same cards. This page is the only place the
-             season is written down: edit it once a year and the rest follows. -->
-        <div class="schedule" data-schedule="events">
+        <!-- ==================================================================
+             THE SEASON IS WRITTEN DOWN HERE AND NOWHERE ELSE ON THE SITE.
+
+             To put a new season up you need this file, an SFTP program, and a
+             text editor. Nothing else has to change: the home page reads its
+             "next service" line out of these cards, and the page sorts itself
+             into what is still to come and what has already happened.
+
+             Four things to do, once a year:
+
+             1. Change data-season on the line below to the new year.
+             2. Change the small line above the heading, "2026 Schedule, 149th
+                Season", to match. The number is the year minus 1877, so 2027
+                is the 150th season.
+             3. Delete every article block between the two markers below.
+             4. Copy the template once for each service, earliest first, and
+                fill in the three lines.
+
+             The template, ready to copy:
+
+             <article class="event-card">
+               <p class="event-day">Sun, Aug 16</p>
+               <h2 class="event-title">Who is speaking or playing</h2>
+               <p class="event-body">
+                 A sentence or two about them.
+               </p>
+             </article>
+
+             The day line may be written "Sat, Jul 11" or "Saturday, July 11".
+             Always spell the day out: that word is what tells a visitor which
+             day it is, and the green or gold tint is only decoration laid on
+             top of it. If a day line cannot be read, that card simply stays
+             where you put it, plain and unsorted, with its text intact.
+
+             Put nothing else on the article tag. The date, the day, and the
+             title are all read from the three lines you just filled in, so
+             there is no hidden copy of them to keep in step.
+             ================================================================== -->
+        <div class="schedule" data-schedule="events" data-season="2026">
           <!-- Start of events -->
-          <article class="event-card event-card-saturday mb-4"
-                   data-event-date="2026-07-11" data-event-title="All That Glitters">
-            <p class="event-day">Sat &middot; <span class="no-break">Jul 11</span></p>
+          <article class="event-card">
+            <p class="event-day">Sat, Jul 11</p>
             <h2 class="event-title">All That Glitters</h2>
             <p class="event-body">
               A Christian band from Berwick, PA.
@@ -86,9 +119,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-saturday mb-4"
-                   data-event-date="2026-07-18" data-event-title="The Sisterhood Music">
-            <p class="event-day">Sat &middot; <span class="no-break">Jul 18</span></p>
+          <article class="event-card">
+            <p class="event-day">Sat, Jul 18</p>
             <h2 class="event-title">The Sisterhood Music</h2>
             <p class="event-body">
               An all-female Christian band from Dalton. "We are a group of sisters,
@@ -97,9 +129,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-saturday mb-4"
-                   data-event-date="2026-07-25" data-event-title="The Frost Duo">
-            <p class="event-day">Sat &middot; <span class="no-break">Jul 25</span></p>
+          <article class="event-card">
+            <p class="event-day">Sat, Jul 25</p>
             <h2 class="event-title">The Frost Duo</h2>
             <p class="event-body">
               A fabulous jazz duo from the Scranton area.
@@ -107,9 +138,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-sunday mb-4"
-                   data-event-date="2026-08-02" data-event-title="Cedar Routes">
-            <p class="event-day">Sun &middot; <span class="no-break">Aug 2</span></p>
+          <article class="event-card">
+            <p class="event-day">Sun, Aug 2</p>
             <h2 class="event-title">Cedar Routes</h2>
             <p class="event-body">
               A Country/Folk Christian band from Allentown, PA.
@@ -117,9 +147,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-sunday mb-4"
-                   data-event-date="2026-08-09" data-event-title="Rick Marsi">
-            <p class="event-day">Sun &middot; <span class="no-break">Aug 9</span></p>
+          <article class="event-card">
+            <p class="event-day">Sun, Aug 9</p>
             <h2 class="event-title">Rick Marsi</h2>
             <p class="event-body">
               A freelance writer, photographer, lecturer and nature guide, Rick
@@ -136,9 +165,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-sunday mb-4"
-                   data-event-date="2026-08-16" data-event-title="Paul and Hannah Chesterton">
-            <p class="event-day">Sun &middot; <span class="no-break">Aug 16</span></p>
+          <article class="event-card">
+            <p class="event-day">Sun, Aug 16</p>
             <h2 class="event-title">Paul and Hannah Chesterton</h2>
             <p class="event-body">
               Join us for a sing-along with Dimock cottage owners (and Maryland
@@ -147,9 +175,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-sunday mb-4"
-                   data-event-date="2026-08-23" data-event-title="Lisa Whitaker">
-            <p class="event-day">Sun &middot; <span class="no-break">Aug 23</span></p>
+          <article class="event-card">
+            <p class="event-day">Sun, Aug 23</p>
             <h2 class="event-title">Lisa Whitaker</h2>
             <p class="event-body">
               Originally from Absecon, NJ, Lisa grew up coming to Dimock every
@@ -168,9 +195,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-sunday mb-4"
-                   data-event-date="2026-08-30" data-event-title="Patti Yoder">
-            <p class="event-day">Sun &middot; <span class="no-break">Aug 30</span></p>
+          <article class="event-card">
+            <p class="event-day">Sun, Aug 30</p>
             <h2 class="event-title">Patti Yoder</h2>
             <p class="event-body">
               Patti Yoder's presentation will center on her 2012 strokes and the
@@ -185,9 +211,8 @@
             </p>
           </article>
 
-          <article class="event-card event-card-sunday mb-4"
-                   data-event-date="2026-09-06" data-event-title="Communion Service">
-            <p class="event-day">Sun &middot; <span class="no-break">Sep 6</span></p>
+          <article class="event-card">
+            <p class="event-day">Sun, Sep 6</p>
             <h2 class="event-title">Communion Service</h2>
             <p class="event-body">
               Communion Service with Julie Rosensteel, the Pastor in S. Montrose.

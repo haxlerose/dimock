@@ -10,20 +10,127 @@ const PINE_DEEP = "rgb(31, 64, 48)";
 const OCHRE_INK = "rgb(138, 86, 24)";
 const MUTED = "rgb(106, 111, 100)";
 
-// The 2026 season as events.html publishes it. Held here so a spec can assert
-// the machine-readable dates against something other than the same attributes
-// it is checking.
-const SEASON_2026 = [
-  ["2026-07-11", "Sat", "Jul 11", "All That Glitters"],
-  ["2026-07-18", "Sat", "Jul 18", "The Sisterhood Music"],
-  ["2026-07-25", "Sat", "Jul 25", "The Frost Duo"],
-  ["2026-08-02", "Sun", "Aug 2", "Cedar Routes"],
-  ["2026-08-09", "Sun", "Aug 9", "Rick Marsi"],
-  ["2026-08-16", "Sun", "Aug 16", "Paul and Hannah Chesterton"],
-  ["2026-08-23", "Sun", "Aug 23", "Lisa Whitaker"],
-  ["2026-08-30", "Sun", "Aug 30", "Patti Yoder"],
-  ["2026-09-06", "Sun", "Sep 6", "Communion Service"],
+// The season is written down once, in events.html, and these checks refuse to
+// keep a second copy of it. Nothing below names a date, a performer, or a card
+// count: the specs read the season off the page and assert that it agrees with
+// itself. Paste in a different year and they stay true without an edit here.
+//
+// The founding year is the one constant, because the ordinal in the eyebrow is
+// derived from it and nothing on the page can check it.
+const FOUNDED = 1877;
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
+const WEEKDAYS = [
+  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+];
+
+const prefixIndex = (names, word) => {
+  const wanted = word.toLowerCase();
+  return names.findIndex((name) => name.toLowerCase().startsWith(wanted));
+};
+
+/**
+ * Reads a card's visible day line the way schedule.js does — an optional
+ * weekday word, a month matched by a three-character-or-longer prefix, and a
+ * day number — and returns what it found alongside the date it means. The
+ * weekday word is redundant by design; keeping it here is what lets a spec fail
+ * when the word and the date disagree.
+ */
+const parseDayLine = (text, year) => {
+  const normalized = String(text ?? "").replace(/\s+/g, " ").trim();
+  const match = /^(?:([A-Za-z]{2,9})\.?[,·\s]+)?([A-Za-z]{3,9})\.?[,·\s]+(\d{1,2})\b/.exec(
+    normalized
+  );
+  if (!match) return { error: `cannot read a month and a day out of "${normalized}"` };
+
+  const [, weekdayWord, monthWord, dayText] = match;
+  const month = prefixIndex(MONTHS, monthWord);
+  if (month < 0) return { error: `"${monthWord}" is not a month name` };
+
+  const day = Number(dayText);
+  const date = new Date(year, month, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
+    return { error: `${monthWord} ${day} is not a real date in ${year}` };
+  }
+
+  let weekday = null;
+  if (weekdayWord) {
+    if (weekdayWord.length < 3) return { error: `"${weekdayWord}" is too short to read` };
+    weekday = prefixIndex(WEEKDAYS, weekdayWord);
+    if (weekday < 0) return { error: `"${weekdayWord}" is not a weekday name` };
+  }
+  return { date, weekday, weekdayWord: weekdayWord ?? null };
+};
+
+const isoOf = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate()
+  ).padStart(2, "0")}`;
+
+const clockOn = (date, time) => `${isoOf(date)}T${time}`;
+
+const shiftedBy = (date, days) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+/**
+ * Fetches events.html and reports what the *served* markup says, whatever
+ * schedule.js has since done to the live DOM. Every schedule spec starts here,
+ * including the ones running on the homepage, so "the season" always means the
+ * one file that holds it.
+ */
+const readSeason = async (page) => {
+  const raw = await page.evaluate(async () => {
+    const response = await fetch("events.html");
+    if (!response.ok) return { error: `events.html responded ${response.status}` };
+    const markup = await response.text();
+    const doc = new DOMParser().parseFromString(markup, "text/html");
+    const wrapper = doc.querySelector('[data-schedule="events"]');
+    const eyebrow = doc.querySelector(".eyebrow");
+    return {
+      markup,
+      season: wrapper ? wrapper.getAttribute("data-season") : null,
+      hasWrapper: Boolean(wrapper),
+      eyebrow: eyebrow ? eyebrow.textContent.replace(/\s+/g, " ").trim() : null,
+      cards: Array.from(doc.querySelectorAll(".event-card")).map((card) => ({
+        day: (card.querySelector(".event-day")?.textContent ?? "")
+          .replace(/\s+/g, " ")
+          .trim(),
+        title: (card.querySelector(".event-title")?.textContent ?? "")
+          .replace(/\s+/g, " ")
+          .trim(),
+        classes: (card.getAttribute("class") ?? "").trim(),
+        legacyDate: card.getAttribute("data-event-date"),
+        legacyTitle: card.getAttribute("data-event-title"),
+      })),
+    };
+  });
+
+  if (raw.error) return raw;
+  if (!raw.hasWrapper) return { error: 'events.html has no [data-schedule="events"] wrapper' };
+  if (!/^\d{4}$/.test(String(raw.season ?? "").trim())) {
+    return { error: `the schedule wrapper is data-season="${raw.season}", expected a four-digit year` };
+  }
+  if (raw.cards.length === 0) return { error: "events.html holds no .event-card elements" };
+
+  const year = Number(raw.season);
+  const events = raw.cards.map((card) => ({ ...card, ...parseDayLine(card.day, year) }));
+  return { ...raw, year, events };
+};
+
+/** The middle service — the useful "mid-season" moment, named by position. */
+const middleOf = (events) => events[Math.floor((events.length - 1) / 2)];
+
+const seasonClock = (pick, time) => async (page) => {
+  const season = await readSeason(page);
+  if (season.error) throw new Error(season.error);
+  const readable = season.events.filter((event) => event.date);
+  if (readable.length === 0) throw new Error("no event card carries a readable date");
+  const picked = pick(readable, season);
+  return clockOn(picked instanceof Date ? picked : picked.date, time);
+};
 
 // Text sitting over a photograph has no computable background. The hero is the
 // only such place on the site; its type is white on a dark scrim with a text
@@ -105,39 +212,43 @@ const collectTextStyles = (skipSelectors) => {
 
 /**
  * Runs in the browser. Reports the events page as script has left it: the group
- * headings in document order, the dates filed under each, and which card is
- * flagged as the next service.
+ * headings in document order, the services filed under each, and which card is
+ * flagged as the next one. Cards are named by their own heading, because that
+ * is the only identifier left on them once the data attributes are gone — and
+ * it is the one a failure message can be read aloud from.
  */
 const collectSchedule = () => {
   const root = document.querySelector('[data-schedule="events"]');
   if (!root) return { error: 'no [data-schedule="events"] wrapper on the page' };
 
-  const dateOf = (card) => card.getAttribute("data-event-date");
+  const nameOf = (card) =>
+    (card.querySelector(".event-title")?.textContent ?? "").replace(/\s+/g, " ").trim();
   const groups = [];
   const ungrouped = [];
   let current = null;
 
   for (const child of Array.from(root.children)) {
     if (child.classList.contains("schedule-group")) {
-      current = { heading: child.textContent.replace(/\s+/g, " ").trim(), dates: [] };
+      current = { heading: child.textContent.replace(/\s+/g, " ").trim(), titles: [] };
       groups.push(current);
     } else if (child.classList.contains("event-card")) {
-      (current ? current.dates : ungrouped).push(dateOf(child));
+      (current ? current.titles : ungrouped).push(nameOf(child));
     }
   }
 
   const cards = Array.from(root.querySelectorAll(".event-card"));
   const next = root.querySelector(".event-card.is-next");
+  const note = root.querySelector(".schedule-note");
   return {
     groups,
     ungrouped,
-    order: cards.map(dateOf),
-    past: cards.filter((card) => card.classList.contains("is-past")).map(dateOf),
-    hidden: cards.filter((card) => card.getClientRects().length === 0).map(dateOf),
-    next: next ? dateOf(next) : null,
+    order: cards.map(nameOf),
+    past: cards.filter((card) => card.classList.contains("is-past")).map(nameOf),
+    hidden: cards.filter((card) => card.getClientRects().length === 0).map(nameOf),
+    next: next ? nameOf(next) : null,
     nextText: next ? next.textContent.replace(/\s+/g, " ").trim() : "",
-    nextIsPast: next ? next.classList.contains("is-past") : false,
     flagged: cards.filter((card) => card.classList.contains("is-next")).length,
+    note: note ? note.textContent.replace(/\s+/g, " ").trim() : null,
   };
 };
 
@@ -352,31 +463,36 @@ export const specs = [
     pages: ["events"],
     check: async (page) => {
       // Strip every colour from the page: if the day is only carried by a tint,
-      // this is where the information disappears.
+      // this is where the information disappears. "Sat" and "Saturday" both
+      // count — the day line is the owner's to write either way.
       const cards = await page.evaluate(() =>
         Array.from(document.querySelectorAll(".event-card")).map((card) => ({
-          text: card.textContent.replace(/\s+/g, " ").trim(),
+          day: (card.querySelector(".event-day")?.textContent ?? "")
+            .replace(/\s+/g, " ")
+            .trim(),
+          title: (card.querySelector(".event-title")?.textContent ?? "")
+            .replace(/\s+/g, " ")
+            .trim(),
           past: card.classList.contains("is-past"),
-          dayTinted: getComputedStyle(
-            card.querySelector(".event-day") ?? card
-          ).color,
+          dayTinted: getComputedStyle(card.querySelector(".event-day") ?? card).color,
         }))
       );
       if (cards.length === 0) return "found no .event-card elements";
-      const silent = cards.filter((card) => !/\b(Sat|Sun)\b/.test(card.text));
+      const silent = cards.filter((card) => !/^\s*(Sat|Sun)/i.test(card.day));
       if (silent.length > 0) {
-        return `${silent.length} event card(s) name no day in text, first: "${silent[0].text.slice(0, 40)}"`;
+        return `${silent.length} event card(s) name no day in text, first: "${silent[0].title}" reads "${silent[0].day}"`;
       }
       // A service that has already happened drops its day tint along with the
       // rest of the card. That is a deliberate second state, not a stray colour
       // — and the day is still spelled out either way, which is the point.
-      const offPalette = cards.filter((card) => {
-        const wanted = card.past ? [MUTED] : [PINE, OCHRE_INK];
-        return !wanted.includes(card.dayTinted);
-      });
-      return offPalette.length === 0
-        ? null
-        : `an .event-day on a ${offPalette[0].past ? "past" : "upcoming"} card is ${offPalette[0].dayTinted}, expected ${(offPalette[0].past ? [MUTED] : [PINE, OCHRE_INK]).join(" / ")}`;
+      for (const card of cards) {
+        const sunday = /^\s*Sun/i.test(card.day);
+        const wanted = card.past ? [MUTED] : sunday ? [PINE] : [OCHRE_INK];
+        if (!wanted.includes(card.dayTinted)) {
+          return `the .event-day on "${card.title}" is ${card.dayTinted}, expected ${wanted.join(" / ")}`;
+        }
+      }
+      return null;
     },
   },
   {
@@ -885,91 +1001,134 @@ export const specs = [
     },
   },
   {
-    id: "event-cards-have-dates",
+    id: "season-is-self-consistent",
     pages: ["events"],
     check: async (page) => {
-      const cards = await page.evaluate(() =>
-        Array.from(document.querySelectorAll(".event-card")).map((card) => ({
-          date: card.getAttribute("data-event-date"),
-          title: card.getAttribute("data-event-title"),
-          heading: (card.querySelector(".event-title")?.textContent ?? "")
-            .replace(/\s+/g, " ")
-            .trim(),
-          day: (card.querySelector(".event-day")?.textContent ?? "")
-            .replace(/\s+/g, " ")
-            .trim(),
-        }))
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+
+      // Every fact appears once, where the visitor reads it. An attribute or a
+      // hand-written tint class is a second copy nobody proofreads, and when the
+      // two disagree the invisible one wins and the page silently lies.
+      const hidden = season.cards.filter(
+        (card) =>
+          card.legacyDate !== null ||
+          card.legacyTitle !== null ||
+          /\bevent-card-(sunday|saturday)\b/.test(card.classes)
       );
-      if (cards.length !== SEASON_2026.length) {
-        return `expected ${SEASON_2026.length} event cards, found ${cards.length}`;
+      if (hidden.length > 0) {
+        const card = hidden[0];
+        const copy =
+          card.legacyDate !== null
+            ? `data-event-date="${card.legacyDate}"`
+            : card.legacyTitle !== null
+              ? `data-event-title="${card.legacyTitle}"`
+              : `a hand-written ${/sunday/.test(card.classes) ? "event-card-sunday" : "event-card-saturday"} class`;
+        return `${hidden.length} card(s) keep an invisible second copy of a fact, first: "${card.title}" carries ${copy}`;
       }
 
-      // The attributes are a second, machine-readable copy of a date and a name
-      // the visitor already reads off the card. If the two ever drift apart the
-      // invisible one silently wins, so they are checked against each other.
       const problems = [];
-      for (const [date, day, label, title] of SEASON_2026) {
-        const card = cards.find((entry) => entry.title === title);
-        if (!card) {
-          problems.push(`no card carries data-event-title="${title}"`);
+      let previous = null;
+      for (const event of season.events) {
+        const name = event.title || "(untitled card)";
+        if (event.error) {
+          problems.push(`"${name}": ${event.error}`);
           continue;
         }
-        if (card.date !== date) {
-          problems.push(`"${title}" is data-event-date="${card.date}", expected ${date}`);
-        }
-        if (card.heading !== title) {
+        if (!event.title) problems.push(`the card dated ${isoOf(event.date)} has no title`);
+        if (event.weekday !== null && event.weekday !== event.date.getDay()) {
           problems.push(
-            `data-event-title="${title}" sits on a card headed "${card.heading}"`
+            `"${name}" reads "${event.day}", but ${isoOf(event.date)} is a ${WEEKDAYS[event.date.getDay()]}`
           );
         }
-        if (!card.day.includes(day) || !card.day.includes(label)) {
-          problems.push(`"${title}" is dated ${date} but its card reads "${card.day}"`);
+        if (previous && event.date.getTime() <= previous.date.getTime()) {
+          problems.push(
+            `"${name}" (${isoOf(event.date)}) does not come after "${previous.title}" (${isoOf(previous.date)}) — cards run in date order`
+          );
         }
+        previous = event;
       }
       return problems.length === 0
         ? null
-        : `${problems.length} problem(s), first: ${problems[0]}`;
+        : `${problems.length} problem(s) in the season, first: ${problems[0]}`;
+    },
+  },
+  {
+    id: "season-ordinal-matches-year",
+    pages: ["events"],
+    check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+      if (season.eyebrow === null) return "no .eyebrow above the schedule";
+
+      const match = /(\d{4})\s+Schedule,\s*(\d+)(st|nd|rd|th)\s+Season/i.exec(season.eyebrow);
+      if (!match) {
+        return `the eyebrow reads "${season.eyebrow}", expected the form "${season.year} Schedule, ${season.year - FOUNDED}th Season"`;
+      }
+      const [, year, ordinal, suffix] = match;
+      if (Number(year) !== season.year) {
+        return `the eyebrow says ${year} and the schedule is data-season="${season.year}"`;
+      }
+      const expected = season.year - FOUNDED;
+      if (Number(ordinal) !== expected) {
+        return `the eyebrow calls this the ${ordinal}${suffix} season; ${season.year} minus ${FOUNDED} is ${expected}`;
+      }
+      const wanted =
+        expected % 100 >= 11 && expected % 100 <= 13
+          ? "th"
+          : ["th", "st", "nd", "rd"][expected % 10] ?? "th";
+      return suffix.toLowerCase() === wanted
+        ? null
+        : `the eyebrow reads "${ordinal}${suffix}", expected "${expected}${wanted}"`;
     },
   },
   {
     id: "events-split-at-stubbed-date",
     pages: ["events"],
-    clock: "2026-08-09T18:00:00",
+    clock: seasonClock(middleOf, "18:00:00"),
     check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
       const schedule = await page.evaluate(collectSchedule);
       if (schedule.error) return schedule.error;
+
+      const readable = season.events.filter((event) => event.date);
+      const middle = middleOf(readable);
+      const at = readable.indexOf(middle);
+      const expected = {
+        Upcoming: readable.slice(at).map((event) => event.title),
+        "Earlier this season": readable.slice(0, at).map((event) => event.title),
+      };
 
       const headings = schedule.groups.map((group) => group.heading);
       if (headings.join(" | ") !== "Upcoming | Earlier this season") {
         return `group headings are "${headings.join(" | ")}", expected "Upcoming | Earlier this season" in that order`;
       }
       if (schedule.ungrouped.length > 0) {
-        return `${schedule.ungrouped.length} card(s) sit above every heading, first ${schedule.ungrouped[0]}`;
+        return `${schedule.ungrouped.length} card(s) sit above every heading, first "${schedule.ungrouped[0]}"`;
       }
-
-      const expected = {
-        Upcoming: ["2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06"],
-        "Earlier this season": ["2026-07-11", "2026-07-18", "2026-07-25", "2026-08-02"],
-      };
       for (const group of schedule.groups) {
         const want = expected[group.heading].join(", ");
-        const got = group.dates.join(", ");
+        const got = group.titles.join(", ");
         if (want !== got) return `"${group.heading}" holds ${got}, expected ${want}`;
       }
 
       // Dimmed, never gone: someone looking for a speaker they heard in July
       // still has to be able to find them.
       if (schedule.hidden.length > 0) {
-        return `${schedule.hidden.length} event card(s) are not rendered at all, first ${schedule.hidden[0]}`;
+        return `${schedule.hidden.length} event card(s) are not rendered at all, first "${schedule.hidden[0]}"`;
       }
       if (schedule.past.join(", ") !== expected["Earlier this season"].join(", ")) {
-        return `.is-past is on ${schedule.past.join(", ")}, expected the four that have passed`;
+        return `.is-past is on ${schedule.past.join(", ")}, expected ${expected["Earlier this season"].join(", ")}`;
       }
       if (schedule.flagged !== 1) {
         return `${schedule.flagged} card(s) carry .is-next, expected exactly 1`;
       }
-      if (schedule.next !== "2026-08-09") {
-        return `.is-next is on ${schedule.next}, expected 2026-08-09`;
+      if (schedule.next !== middle.title) {
+        return `.is-next is on "${schedule.next}", expected "${middle.title}"`;
+      }
+      if (schedule.note !== null) {
+        return `mid-season, the page already says "${schedule.note}"`;
       }
       return /next service/i.test(schedule.nextText)
         ? null
@@ -979,17 +1138,21 @@ export const specs = [
   {
     id: "event-upcoming-until-end-of-day",
     pages: ["events"],
-    // Eleven at night on the day of a service. It has not happened yet as far
-    // as the page is concerned, and it must not slide into the past because the
-    // clock has moved past midnight this morning.
-    clock: "2026-08-09T23:00:00",
+    // Eleven at night on the day of the last service of the season. It has not
+    // happened yet as far as the page is concerned, and it must not slide into
+    // the past because the clock has moved past midnight this morning.
+    clock: seasonClock((events) => events[events.length - 1], "23:00:00"),
     check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+      const last = season.events.filter((event) => event.date).slice(-1)[0];
+
       const schedule = await page.evaluate(collectSchedule);
       if (schedule.error) return schedule.error;
-      if (schedule.next !== "2026-08-09") {
-        return `at 11pm on 2026-08-09 the next service is ${schedule.next}, expected that evening's own service`;
+      if (schedule.next !== last.title) {
+        return `at 11pm on ${isoOf(last.date)} the next service is "${schedule.next}", expected that evening's own service "${last.title}"`;
       }
-      return schedule.past.includes("2026-08-09")
+      return schedule.past.includes(last.title)
         ? "the evening's own service is already filed under Earlier this season at 11pm"
         : null;
     },
@@ -997,8 +1160,12 @@ export const specs = [
   {
     id: "events-preseason-has-no-past-group",
     pages: ["events"],
-    clock: "2026-07-01T12:00:00",
+    clock: seasonClock((events) => shiftedBy(events[0].date, -1), "12:00:00"),
     check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+      const first = season.events.filter((event) => event.date)[0];
+
       const schedule = await page.evaluate(collectSchedule);
       if (schedule.error) return schedule.error;
       const headings = schedule.groups.map((group) => group.heading);
@@ -1008,16 +1175,22 @@ export const specs = [
       if (schedule.past.length > 0) {
         return `${schedule.past.length} card(s) are dimmed before the season has started`;
       }
-      return schedule.next === "2026-07-11"
+      if (schedule.note !== null) {
+        return `before the season has started, the page says "${schedule.note}"`;
+      }
+      return schedule.next === first.title
         ? null
-        : `.is-next is on ${schedule.next}, expected the opening service 2026-07-11`;
+        : `.is-next is on "${schedule.next}", expected the opening service "${first.title}"`;
     },
   },
   {
     id: "events-postseason-has-no-upcoming-group",
     pages: ["events"],
-    clock: "2026-12-01T12:00:00",
+    clock: seasonClock((events) => shiftedBy(events[events.length - 1].date, 1), "12:00:00"),
     check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+
       const schedule = await page.evaluate(collectSchedule);
       if (schedule.error) return schedule.error;
       const headings = schedule.groups.map((group) => group.heading);
@@ -1027,8 +1200,9 @@ export const specs = [
       if (!headings.includes("Earlier this season")) {
         return `expected an Earlier this season heading, found "${headings.join(" | ")}"`;
       }
-      if (schedule.past.length !== SEASON_2026.length) {
-        return `${schedule.past.length} of ${SEASON_2026.length} card(s) are marked past after the season has ended`;
+      const readable = season.events.filter((event) => event.date).length;
+      if (schedule.past.length !== readable) {
+        return `${schedule.past.length} of ${readable} card(s) are marked past after the season has ended`;
       }
       return schedule.flagged === 0
         ? null
@@ -1036,16 +1210,41 @@ export const specs = [
     },
   },
   {
+    id: "off-season-line-appears",
+    pages: ["events"],
+    clock: seasonClock((events) => shiftedBy(events[events.length - 1].date, 1), "12:00:00"),
+    check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+
+      const schedule = await page.evaluate(collectSchedule);
+      if (schedule.error) return schedule.error;
+      if (schedule.note === null) {
+        // A static file cannot say "that was the last one" on its own, and nine
+        // past services with no framing is the page implying a service is coming.
+        return "every service has passed and nothing on the page says the season has ended";
+      }
+      return schedule.note.includes(String(season.year))
+        ? null
+        : `the off-season line reads "${schedule.note}" and never names the ${season.year} season`;
+    },
+  },
+  {
     id: "homepage-band-names-next-service",
     pages: ["index"],
-    clock: "2026-08-09T18:00:00",
+    // The clock is read out of events.html, fetched from inside the loaded
+    // homepage — the same journey schedule.js makes.
+    clock: seasonClock(middleOf, "18:00:00"),
     check: async (page) => {
+      const season = await readSeason(page);
+      if (season.error) return season.error;
+      const middle = middleOf(season.events.filter((event) => event.date));
+      const spoken = `${WEEKDAYS[middle.date.getDay()]}, ${MONTHS[middle.date.getMonth()]} ${middle.date.getDate()}`;
+
       const text = (await page.locator("#next-service").innerText())
         .replace(/\s+/g, " ")
         .trim();
-      const missing = ["Sunday, August 9", "Rick Marsi"].filter(
-        (needle) => !text.includes(needle)
-      );
+      const missing = [spoken, middle.title].filter((needle) => !text.includes(needle));
       return missing.length === 0
         ? null
         : `the band reads "${text}" and never names ${missing.join(" or ")}`;
@@ -1054,7 +1253,7 @@ export const specs = [
   {
     id: "homepage-band-off-season",
     pages: ["index"],
-    clock: "2026-12-01T12:00:00",
+    clock: seasonClock((events) => shiftedBy(events[events.length - 1].date, 1), "12:00:00"),
     check: async (page) => {
       const text = (await page.locator("#next-service").innerText())
         .replace(/\s+/g, " ")
@@ -1084,29 +1283,45 @@ export const specs = [
             : `without JavaScript the homepage band reads "${text}"`;
         }
 
+        // The point is that nothing is gated: whatever the file holds is on
+        // screen, in the order it was written, each service still naming its
+        // own day. How many there are is the owner's business, not a check's.
         const cards = await plain.evaluate(() =>
           Array.from(document.querySelectorAll(".event-card")).map((card) => ({
-            date: card.getAttribute("data-event-date"),
+            title: (card.querySelector(".event-title")?.textContent ?? "")
+              .replace(/\s+/g, " ")
+              .trim(),
+            day: (card.querySelector(".event-day")?.textContent ?? "")
+              .replace(/\s+/g, " ")
+              .trim(),
             visible: card.getClientRects().length > 0,
             grouped: card.classList.contains("is-past") || card.classList.contains("is-next"),
           }))
         );
-        if (cards.length !== SEASON_2026.length) {
-          return `without JavaScript the page shows ${cards.length} of ${SEASON_2026.length} events`;
-        }
+        if (cards.length === 0) return "without JavaScript the page shows no events at all";
+
         const invisible = cards.filter((card) => !card.visible);
         if (invisible.length > 0) {
-          return `${invisible.length} event(s) are not rendered without JavaScript, first ${invisible[0].date}`;
+          return `${invisible.length} event(s) are not rendered without JavaScript, first "${invisible[0].title}"`;
         }
         const marked = cards.filter((card) => card.grouped);
         if (marked.length > 0) {
           return `${marked.length} card(s) are pre-marked past or next in the served markup — the split is the script's job`;
         }
-        const order = cards.map((card) => card.date).join(", ");
-        const documentOrder = SEASON_2026.map(([date]) => date).join(", ");
-        return order === documentOrder
+        const dayless = cards.filter((card) => !/\b(Sat|Sun)/i.test(card.day));
+        if (dayless.length > 0) {
+          return `"${dayless[0].title}" reads "${dayless[0].day}" and never names its day`;
+        }
+
+        // Read the served markup from the ordinary page: the no-JavaScript
+        // context is here to render, not to run a fetch of its own.
+        const season = await readSeason(page);
+        if (season.error) return season.error;
+        const served = season.events.map((event) => event.title).join(", ");
+        const rendered = cards.map((card) => card.title).join(", ");
+        return served === rendered
           ? null
-          : `without JavaScript the events read ${order}, expected document order ${documentOrder}`;
+          : `without JavaScript the events read ${rendered}, expected the served order ${served}`;
       }),
   },
 ];
